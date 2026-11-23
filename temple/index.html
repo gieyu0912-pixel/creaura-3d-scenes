@@ -1528,12 +1528,19 @@ renderer.domElement.addEventListener('pointerdown',()=>{moreBox.classList.remove
 // ---------- 設定：累積香客 & 預約樓主祈福 ----------
 // backend：Google Apps Script 網頁應用程式網址（部署方式見 README / apps-script.gs）
 // lineOA：LINE 官方帳號 ID（例如 '@abc1234'），沒有後端時用 LINE 送出預約
-const CFG={backend:'',lineOA:'@584enjys',lineAdd:'https://lin.ee/RXMywh9'};
+const CFG={backend:'https://script.google.com/macros/s/AKfycbw30QdWsTjmTvofZuYC6fflY2kdoVPe1wgekeHrURdxVNnXAW45YNxZeoXCrDe1oCwvGw/exec',lineOA:'@584enjys',lineAdd:'https://lin.ee/RXMywh9'};
 const visEl=document.getElementById('visits');
 function showVisits(n){if(!(n>0))return;visEl.innerHTML=`🙏 累積香客 <b>${Number(n).toLocaleString('zh-TW')}</b> 人`;visEl.style.display='';}
-(function(){if(!CFG.backend)return;let key='ct_visit_day',today=new Date().toISOString().slice(0,10),seen='';try{seen=localStorage.getItem(key)||'';}catch(e){}
-  const act=seen===today?'count':'hit';
-  fetch(CFG.backend+(CFG.backend.includes('?')?'&':'?')+'action='+act).then(r=>r.json()).then(d=>{showVisits(d.visits);if(act==='hit'){try{localStorage.setItem(key,today);}catch(e){}}}).catch(()=>{});})();
+const DEBUG=location.hash==='#debug';
+function dbg(m){if(!DEBUG)return;visEl.style.display='';visEl.innerHTML+=`<div style="font-size:11px;opacity:.9">🔧 ${String(m).replace(/[<>&]/g,'')}</div>`;}
+function jsonp(url){return new Promise((res,rej)=>{const cb='__cb'+Date.now()+Math.floor(Math.random()*1e4);const sc=document.createElement('script');
+  const clean=()=>{clearTimeout(tm);try{delete window[cb];}catch(e){window[cb]=undefined;}sc.remove();};const tm=setTimeout(()=>{clean();rej(new Error('jsonp timeout'));},9000);
+  window[cb]=d=>{clean();res(d);};sc.onerror=()=>{clean();rej(new Error('jsonp load error'));};sc.src=url+'&callback='+cb;document.head.appendChild(sc);});}
+(function(){if(!CFG.backend){dbg('backend 未設定');return;}const key='ct_visit_day',today=new Date().toISOString().slice(0,10);let seen='';try{seen=localStorage.getItem(key)||'';}catch(e){}
+  const act=seen===today?'count':'hit';const url=CFG.backend+(CFG.backend.includes('?')?'&':'?')+'action='+act;dbg('action='+act);
+  const ok=(d,via)=>{dbg(via+' 回應：'+JSON.stringify(d));showVisits(d&&d.visits);if(act==='hit'){try{localStorage.setItem(key,today);}catch(e){}}};
+  fetch(url).then(r=>{dbg('fetch 狀態 '+r.status);return r.json();}).then(d=>ok(d,'fetch')).catch(err=>{dbg('fetch 失敗：'+err.message+'，改用 JSONP');
+    jsonp(url).then(d=>ok(d,'jsonp')).catch(e2=>dbg('JSONP 失敗：'+e2.message+'（請確認 Apps Script 已更新並部署新版本，存取權為「所有人」）'));});})();
 const bkBox=document.getElementById('bkBox'),bkMsg=document.getElementById('bkMsg');
 document.getElementById('bBook').onclick=()=>{bkBox.classList.add('show');bkMsg.textContent='';const d=document.getElementById('bkDate');const t=new Date();d.min=t.toISOString().slice(0,10);if(!d.value)d.value=d.min;
   const ty=document.getElementById('bkType');const map={wealth:'求財',love:'姻緣',fame:'功名',mazu:'收驚平安'};if(map[deity])ty.value=map[deity];
@@ -1547,7 +1554,7 @@ document.getElementById('bkForm').addEventListener('submit',e=>{e.preventDefault
   const done=m=>{bkMsg.textContent=m;setAct('預約了樓主祈福 📅');burstSpark(new V3(0,BY+13,BZ),40,0xffe08a);[523,659,784].forEach((f,i)=>tone(f,i*.12,1.5,.06));};
   const btn=document.getElementById('bkSend');
   if(CFG.backend){btn.disabled=true;bkMsg.textContent='傳送中…';
-    fetch(CFG.backend,{method:'POST',body:JSON.stringify(d)}).then(r=>r.json()).then(r=>{btn.disabled=false;if(r&&r.ok){done(`已收到預約 🙏 樓主將於 ${d.date} 為「${d.name}」祈福`);document.getElementById('bkForm').reset();}else bkMsg.textContent='送出失敗，請稍後再試';})
+    fetch(CFG.backend,{method:'POST',body:JSON.stringify(d)}).then(r=>r.json()).then(r=>{btn.disabled=false;if(r&&r.ok){done(`已收到預約 🙏 樓主將於 ${d.date} 為「${d.name}」祈福`);document.getElementById('bkForm').reset();document.getElementById('bkDate').value=d.date;if(CFG.lineOA){const a=document.createElement('a');a.textContent='💬 也傳到樓主 LINE';a.href=`https://line.me/R/oaMessage/${encodeURIComponent(CFG.lineOA)}/?${encodeURIComponent(text)}`;a.target='_blank';a.rel='noopener';a.style.cssText='display:block;margin-top:6px;color:#06a03c;font-weight:900';bkMsg.appendChild(a);}}else bkMsg.textContent='送出失敗，請稍後再試';})
       .catch(()=>{btn.disabled=false;bkMsg.textContent='送出失敗，請稍後再試';});}
   else if(CFG.lineOA){const a=document.createElement('a');a.href=`https://line.me/R/oaMessage/${encodeURIComponent(CFG.lineOA)}/?${encodeURIComponent(text)}`;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();done('已開啟 LINE，按下傳送即完成預約 🙏');}
   else{try{navigator.clipboard.writeText(text).then(()=>done('已複製預約內容，請貼給樓主 🙏'),()=>{bkMsg.textContent='無法複製，請截圖傳給樓主';});}catch(err){bkMsg.textContent='無法複製，請截圖傳給樓主';}}
