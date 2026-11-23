@@ -40,32 +40,118 @@
   @keyframes fi{from{opacity:0;transform:translateX(10px)}}
   #online .note{opacity:.55;font-size:11px;padding:6px 4px 0;line-height:1.5}
   #ui.hide ~ #online{opacity:0;pointer-events:none}
+  #kqToast{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);font-size:clamp(20px,5vw,30px);font-weight:900;letter-spacing:.15em;pointer-events:none;opacity:0;transition:opacity .5s;
+     text-shadow:0 0 12px rgba(0,0,0,.8),0 0 30px rgba(255,180,90,.7);white-space:nowrap;z-index:8}
+  #kqCard{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);width:min(88vw,380px);max-height:86vh;overflow:auto;opacity:0;pointer-events:none;transition:all .45s;z-index:9;
+     background:linear-gradient(180deg,#f8dc7a,#eec24e);color:#7a0c0c;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.55);padding:16px 16px 14px;box-sizing:border-box;
+     outline:3px solid #b01818;outline-offset:-10px}
+  #kqCard.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+  #kqCard .top{display:flex;justify-content:space-between;align-items:center;padding:6px 10px 10px;border-bottom:2px solid #b01818}
+  #kqHead{font-size:14px;letter-spacing:.2em;line-height:1.5}#kqHead b{font-size:24px;letter-spacing:.15em}
+  #kqCard .lv{font-size:22px;font-weight:900;padding:6px 12px;border:2px solid currentColor;border-radius:4px;letter-spacing:.2em}
+  #kqCard .lv.good{color:#c01010;background:rgba(255,255,255,.35)}#kqCard .lv.mid{color:#8a5a10}#kqCard .lv.bad{color:#3a3a3a}
+  #kqPoem{writing-mode:vertical-rl;margin:14px auto;height:clamp(190px,34vh,250px);display:flex;justify-content:center;gap:14px;
+     font-family:"LXGW WenKai TC","Noto Serif TC",serif;font-size:clamp(22px,6vw,28px);font-weight:700;letter-spacing:.25em;color:#8a0a0a}
+  #kqExp{font-size:14.5px;line-height:1.8;padding:10px 10px 4px;border-top:1px dashed #b01818}
+  #kqExp::before{content:"解曰：";font-weight:900}
+  #kqCard .btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+  #kqCard button{background:#b01818;color:#ffe9a8;border-color:#7a0c0c;font-size:13px;padding:8px 14px}
   #err{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px}
+
+  /* ---- 精簡介面：中央淨空 ---- */
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  #ui{padding:calc(env(safe-area-inset-top) + 12px) calc(env(safe-area-inset-right) + 12px) calc(env(safe-area-inset-bottom) + 10px) calc(env(safe-area-inset-left) + 12px)}
+  #ui .top{max-width:55vw}
+  h1{font-size:clamp(22px,6.5vw,44px);letter-spacing:.1em;text-shadow:0 2px 10px rgba(60,20,0,.6),0 0 24px rgba(255,170,90,.55)}
+  .sub{font-size:clamp(10px,2.8vw,13px);letter-spacing:.2em;opacity:1;text-shadow:0 1px 6px rgba(0,0,0,.75)}
+  .bottom{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .hint{text-shadow:0 1px 6px rgba(0,0,0,.8);margin:0}
+  @media (max-width:700px){.hint{display:none}}
+  .chips,.dock{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px}
+  .chips::-webkit-scrollbar,.dock::-webkit-scrollbar{display:none}
+  .chips button{flex:0 0 auto;white-space:nowrap;font-size:12.5px;padding:6px 11px;line-height:1.2;background:rgba(30,20,50,.45)}
+  .chips button.on{background:rgba(220,150,60,.7)}
+  .dock{background:rgba(25,16,40,.42);border:1px solid rgba(255,230,180,.22);border-radius:20px;padding:5px 6px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .ib{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:56px;height:50px;padding:2px;border:none;border-radius:14px;background:transparent;font-size:11px;line-height:1.1;white-space:nowrap}
+  .ib i,#more i,.offerFab i{font-style:normal;font-size:20px;line-height:1}
+  .ib.on{background:rgba(220,150,60,.45)}
+  .ib.gold{background:linear-gradient(135deg,rgba(255,190,70,.8),rgba(220,90,40,.8));box-shadow:0 0 12px rgba(255,180,80,.5)}
+  .offerFab{position:fixed;right:calc(env(safe-area-inset-right) + 12px);bottom:calc(env(safe-area-inset-bottom) + 128px);width:76px;height:76px;border-radius:50%;padding:4px;
+     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:900;line-height:1.1;white-space:nowrap;z-index:6;
+     background:radial-gradient(circle at 35% 30%,#ffd98a,#e8862e 70%,#b8501a);border:2px solid #ffe8b0;box-shadow:0 0 22px rgba(255,170,70,.75);animation:fab 2.2s ease-in-out infinite}
+  .offerFab i{font-size:26px}
+  @keyframes fab{50%{box-shadow:0 0 34px rgba(255,190,90,.95);transform:scale(1.05)}}
+  #more{position:fixed;right:calc(env(safe-area-inset-right) + 12px);bottom:calc(env(safe-area-inset-bottom) + 74px);display:none;flex-direction:column;gap:4px;padding:6px;z-index:7;
+     background:rgba(25,16,40,.82);border:1px solid rgba(255,230,180,.3);border-radius:16px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #more.open{display:flex}
+  #more button{display:flex;align-items:center;gap:8px;border:none;background:transparent;border-radius:10px;padding:8px 12px;font-size:13px;white-space:nowrap;text-align:left}
+  #more button.on{background:rgba(220,150,60,.45)}
+  #ui.hide ~ #bOffer,#ui.hide ~ #more{opacity:0;pointer-events:none}
+  #eye{top:calc(env(safe-area-inset-top) + 12px);right:calc(env(safe-area-inset-right) + 12px);width:40px;height:40px;padding:0;font-size:16px}
+  #online{top:calc(env(safe-area-inset-top) + 12px);right:calc(env(safe-area-inset-right) + 60px);width:auto;max-width:min(240px,48vw)}
+  #online:not(.min){width:min(240px,62vw)}
+  #online .hd{padding:9px 12px;font-size:12px;white-space:nowrap}
+  #carve{top:auto!important;bottom:calc(env(safe-area-inset-bottom) + 132px);text-shadow:0 1px 6px rgba(0,0,0,.7)}
+
+  #visits{margin-top:6px;font-size:12px;letter-spacing:.08em;text-shadow:0 1px 6px rgba(0,0,0,.8)}#visits b{color:#ffe08a;font-size:14px}
+  #bBook{margin-top:6px;pointer-events:auto;font-size:12px;padding:6px 11px;background:linear-gradient(135deg,rgba(176,24,24,.85),rgba(220,90,40,.85));border-color:#ffd88a}
+  #bkBox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(10,5,20,.55);z-index:10;padding:16px}
+  #bkBox.show{display:flex}
+  #bkForm{width:min(92vw,400px);max-height:88vh;overflow:auto;background:linear-gradient(180deg,#f8dc7a,#eec24e);color:#5a0a0a;border-radius:8px;padding:18px 18px 14px;box-sizing:border-box;outline:3px solid #b01818;outline-offset:-9px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  #bkForm .bkT{font-size:20px;font-weight:900;letter-spacing:.12em;text-align:center;color:#8a0a0a}
+  #bkForm .bkS{font-size:12px;text-align:center;margin:4px 0 10px;opacity:.8}
+  #bkForm label{display:block;font-size:13px;font-weight:700;margin:8px 4px}
+  #bkForm input:not([type=checkbox]),#bkForm select,#bkForm textarea{display:block;width:100%;box-sizing:border-box;margin-top:4px;padding:8px 10px;font:inherit;font-weight:500;font-size:14px;border:1.5px solid #b01818;border-radius:6px;background:#fffaf0;color:#3a0a0a}
+  #bkForm .ck{font-weight:500;font-size:12px;display:flex;gap:6px;align-items:flex-start}
+  #bkForm .bkMsg{min-height:18px;font-size:13px;font-weight:700;text-align:center;color:#8a0a0a;margin:6px 0}
+  #bkForm .bkLine{text-align:center;font-size:12px;margin:0 0 8px}#bkForm .bkLine a{color:#06a03c;font-weight:900;text-decoration:none}
+  #bkForm .btns{display:flex;gap:8px;justify-content:center}
+  #bkForm button{background:#b01818;color:#ffe9a8;border-color:#7a0c0c;font-size:14px;padding:9px 18px}
+  #bkForm #bkCancel{background:transparent;color:#7a0c0c}
 </style>
 </head>
 <body>
 <div id="ui">
-  <div><h1>雲上禪寺</h1><div class="sub" id="sub">大日如來 · 光明遍照</div></div>
-  <div>
-    <div class="bar" id="wish" style="margin-bottom:8px">
-      <button data-d="buddha" class="on">🪷 禮佛</button><button data-d="wealth">💰 求財</button><button data-d="love">💞 求姻緣</button><button data-d="fame">📜 求功名</button><button data-d="mazu">🌊 天上聖母</button>
-      <button id="bOffer" class="offer" style="display:none"></button>
+  <div class="top"><h1>雲上禪寺</h1><div class="sub" id="sub">大日如來 · 光明遍照</div><div id="visits" style="display:none"></div><button id="bBook">📅 預約樓主祈福</button></div>
+  <div class="bottom">
+    <div class="hint">拖曳旋轉 · 雙指縮放 · 點兩下敲鐘 · 選擇求願後按右下金色按鈕供奉</div>
+    <div class="chips" id="wish">
+      <button data-d="buddha" class="on">🪷 禮佛</button><button data-d="wealth">💰 求財</button><button data-d="love">💞 姻緣</button><button data-d="fame">📜 功名</button><button data-d="mazu">🌊 聖母</button>
     </div>
-    <div class="hint">拖曳旋轉 · 雙指縮放 · 點兩下敲鐘 · 選擇求願後按金色按鈕供奉</div>
-    <div class="bar">
-      <button id="bAuto" class="on">自動環繞</button>
-      <button id="bBell">🔔 敲鐘</button>
-      <button id="bLamp">🪷 點蓮燈</button>
-      <button id="bSnd">🔇 自然音</button>
-      <button id="bMode">🌙 夜晚</button>
-      <button id="bAltar">🙏 供桌特寫</button>
-      <button id="bFin">✨ 金身</button>
+    <div class="dock">
+      <button id="bBell" class="ib"><i>🔔</i><span>敲鐘</span></button>
+      <button id="bLamp" class="ib"><i>🪷</i><span>蓮燈</span></button>
+      <button id="bKq" class="ib gold"><i>🎋</i><span>抽籤</span></button>
+      <button id="bMode" class="ib"><i>🌙</i><span>夜晚</span></button>
+      <button id="bMore" class="ib"><i>⋯</i><span>更多</span></button>
     </div>
   </div>
+</div>
+<button id="bOffer" class="offerFab" style="display:none"></button>
+<div id="more">
+  <button id="bAuto" class="on"><i>🔄</i><span>自動環繞</span></button>
+  <button id="bSnd"><i>🔇</i><span>自然音</span></button>
+  <button id="bAltar"><i>🙏</i><span>供桌特寫</span></button>
+  <button id="bFin"><i>✨</i><span>金身</span></button>
 </div>
 <button id="eye" title="隱藏介面">👁</button>
 <div id="carve" style="position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 86px);transform:translateX(-50%);font-size:13px;letter-spacing:.2em;opacity:.8;pointer-events:none">🪵 神像雕刻中…</div>
 <div id="online"><div class="hd" id="onHd"><span class="dot"></span><span id="onCount">即時在線信徒</span><span style="margin-left:auto;opacity:.6" id="onTog">▾</span></div><div class="bd"><div id="onList"></div><div class="feed" id="onFeed"></div><div class="note" id="onNote"></div></div></div>
+<div id="kqToast"></div>
+<div id="kqCard"><div class="top"><div id="kqHead"></div><div class="lv" id="kqLv"></div></div><div id="kqPoem"></div><div id="kqExp"></div>
+<div class="btns"><button id="kqAgain">🎋 再抽一支</button><button id="kqCopy">📋 複製籤詩</button><button id="kqClose">🙏 收下籤詩</button></div></div>
+<div id="bkBox"><form id="bkForm" autocomplete="on">
+  <div class="bkT">📅 預約樓主祈福</div><div class="bkS">樓主將於你選的日子，在佛前為你上香祈福</div>
+  <label>稱呼 *<input id="bkName" maxlength="20" placeholder="例如：王小明"></label>
+  <label>祈福類別<select id="bkType"><option>平安</option><option>求財</option><option>姻緣</option><option>功名</option><option>收驚平安</option><option>健康</option><option>其他</option></select></label>
+  <label>祈福日期<input id="bkDate" type="date"></label>
+  <label>心願內容<textarea id="bkWish" maxlength="200" rows="3" placeholder="想祈求的事（200 字內）"></textarea></label>
+  <label>聯絡方式（選填）<input id="bkContact" maxlength="60" placeholder="LINE ID 或 Email"></label>
+  <label class="ck"><input type="checkbox" id="bkOk"> 我同意樓主保存以上資料，僅用於祈福與聯繫</label>
+  <div class="bkMsg" id="bkMsg"></div>
+  <div class="bkLine">還沒加樓主好友？<a id="bkAdd" href="https://lin.ee/RXMywh9" target="_blank" rel="noopener">💬 加入 LINE 好友</a></div>
+  <div class="btns"><button type="button" id="bkCancel">取消</button><button type="submit" id="bkSend">🙏 送出預約</button></div>
+</form></div>
 <div id="err">3D 函式庫載入失敗，請重新整理頁面。</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1272,7 +1358,8 @@ function ambStart(){const a=aud();if(!a)return;if(!amb.started){amb.started=true
   amb.on=true;const t=a.currentTime;amb.master.gain.cancelScheduledValues(t);amb.master.gain.setValueAtTime(amb.master.gain.value,t);amb.master.gain.linearRampToValueAtTime(.9,t+2.5);updSndBtn();}
 function ambStop(){amb.on=false;if(amb.master&&actx){const t=actx.currentTime;amb.master.gain.cancelScheduledValues(t);amb.master.gain.setValueAtTime(amb.master.gain.value,t);amb.master.gain.linearRampToValueAtTime(0,t+1);}updSndBtn();}
 const bSnd=document.getElementById('bSnd');
-function updSndBtn(){bSnd.textContent=amb.on?'🔈 自然音':'🔇 自然音';bSnd.classList.toggle('on',amb.on);}
+const lbl=(el,t)=>{const k=t.indexOf(' ');el.innerHTML=k>0?`<i>${t.slice(0,k)}</i><span>${t.slice(k+1)}</span>`:t;};
+function updSndBtn(){lbl(bSnd,amb.on?'🔈 自然音':'🔇 自然音');bSnd.classList.toggle('on',amb.on);}
 let ambUserOff=false;
 bSnd.onclick=e=>{unlockAudio();if(amb.on&&actx&&actx.state==='running'){ambUserOff=true;ambStop();}else{ambUserOff=false;ambStart();}};
 // iOS／手機音訊解鎖：在 click/touchend 中恢復 AudioContext，並播放無聲 <audio> 讓靜音開關不擋住網頁音效
@@ -1285,16 +1372,16 @@ function unlockAudio(){const a=aud();if(!a)return;try{const r=a.resume();if(r&&r
   try{if(!unlockEl){unlockEl=new Audio(silentWav());unlockEl.loop=true;unlockEl.setAttribute('playsinline','');unlockEl.volume=1;}const p=unlockEl.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
 let gestured=false;
 const onGesture=e=>{unlockAudio();if(!gestured){gestured=true;if(e.target!==bSnd&&!amb.on&&!ambUserOff)ambStart();}
-  setTimeout(()=>{if(actx&&actx.state!=='running'&&amb.on)bSnd.textContent='🔇 點我開聲音';else updSndBtn();},400);};
+  setTimeout(()=>{if(actx&&actx.state!=='running'&&amb.on)lbl(bSnd,'🔇 點我開聲音');else updSndBtn();},400);};
 ['click','touchend','keydown'].forEach(ev=>addEventListener(ev,onGesture,true));
-const bMode=document.getElementById('bMode');bMode.onclick=()=>{nightT=nightT?0:1;bMode.textContent=nightT?'🌅 晨曦':'🌙 夜晚';updateSub();};
+const bMode=document.getElementById('bMode');bMode.onclick=()=>{nightT=nightT?0:1;lbl(bMode,nightT?'🌅 晨曦':'🌙 夜晚');updateSub();};
 let deity='buddha';
 const SUBS={mazu:'天上聖母 · 收驚保平安',wealth:'財神爺 · 招財進寶',love:'月下老人 · 千里姻緣一線牽',fame:'文昌帝君 · 金榜題名'};
 const OFFER={mazu:['🔔 收驚',offerMazu],wealth:['🪙 供元寶',offerWealth],love:['🌸 供百合',offerLove],fame:['🖌️ 供文房四寶',offerFame]};
 function updateSub(){document.getElementById('sub').textContent=deity==='buddha'?(nightT?'地藏王菩薩 · 大願地藏':'大日如來 · 光明遍照'):SUBS[deity];}
 const bOffer=document.getElementById('bOffer');
 document.querySelectorAll('#wish [data-d]').forEach(b=>b.onclick=()=>{deity=b.dataset.d;setWish(deity);document.querySelectorAll('#wish [data-d]').forEach(x=>x.classList.toggle('on',x===b));
-  if(deity==='buddha'){bOffer.style.display='none';}else{bOffer.style.display='';bOffer.textContent=OFFER[deity][0];}updateSub();});
+  if(deity==='buddha'){bOffer.style.display='none';}else{bOffer.style.display='';lbl(bOffer,OFFER[deity][0]);}updateSub();});
 bOffer.onclick=()=>{if(OFFER[deity]){OFFER[deity][1]();setAct(OFFER[deity][0].replace(/^\S+\s/,'')+(deity==='love'?' 🌸':deity==='wealth'?' 💰':deity==='mazu'?' 🙏':' 📜'));}};
 // ---------- 即時在線信徒 ----------
 const TZ_REGION={'Asia/Taipei':'台灣','Asia/Hong_Kong':'香港','Asia/Macau':'澳門','Asia/Shanghai':'中國','Asia/Chongqing':'中國','Asia/Urumqi':'中國','Asia/Singapore':'新加坡','Asia/Kuala_Lumpur':'馬來西亞','Asia/Kuching':'馬來西亞','Asia/Tokyo':'日本','Asia/Seoul':'韓國','Asia/Bangkok':'泰國','Asia/Ho_Chi_Minh':'越南','Asia/Saigon':'越南','Asia/Manila':'菲律賓','Asia/Jakarta':'印尼','Asia/Kolkata':'印度','Asia/Dubai':'阿聯',
@@ -1322,7 +1409,7 @@ function setWish(w){me.wish=WISH_NAME[w]||'禮佛';pushMe();renderOnline();}
 function renderOnline(){
   const list=room?peerList.filter(p=>p.kind==='viewer'):[{isMe:true,sameTab:true,presence:me}];
   const n=Math.max(1,list.length);
-  document.getElementById('onCount').textContent=`即時在線信徒 ${n} 位`;
+  document.getElementById('onCount').textContent=`${innerWidth<700?'在線':'即時在線信徒'} ${n} 位`;
   const rows=list.map(p=>{const q=p.presence||{};const d=clip(q.dev||'…',30),r=clip(q.region||'',20);
     return `<div class="row"><div class="ic">${devIcon(d)}</div><div><div><b>${esc(d)}</b>${p.isMe?(p.sameTab?'<span class="me">你</span>':'<span class="me">你（另一分頁）</span>'):''}</div><div class="sm">📍 ${esc(r)} · 🙏 ${esc(clip(q.wish||'禮佛',8))}</div></div></div>`;});
   document.getElementById('onList').innerHTML=rows.join('');
@@ -1341,10 +1428,130 @@ renderOnline();
     renderOnline();},()=>{room=null;renderOnline();});
   pushMe();renderOnline();})();
 
-const bFin=document.getElementById('bFin');bFin.onclick=()=>{woodFinish=!woodFinish;applyFinish();bFin.textContent=woodFinish?'✨ 金身':'🪵 木雕';};
+const bFin=document.getElementById('bFin');bFin.onclick=()=>{woodFinish=!woodFinish;applyFinish();lbl(bFin,woodFinish?'✨ 金身':'🪵 木雕');};
 let closeUp=false;const bAltar=document.getElementById('bAltar');bAltar.onclick=()=>{closeUp=!closeUp;bAltar.classList.toggle('on',closeUp);
   if(closeUp){tRad=portrait?17:11.5;tPhi=1.22;tTheta=Math.round(tTheta/6.2832)*6.2832;auto=false;bAuto.classList.remove('on');}else{tRad=portrait?120:92;tPhi=1.18;}};
 const ui=document.getElementById('ui');document.getElementById('eye').onclick=()=>ui.classList.toggle('hide');
+// ---------- 抽籤：搖籤筒 → 出籤 → 擲筊 → 籤詩 ----------
+const QIAN=[
+['上上','雲開月出照山前','萬里晴空映碧天','從此前程多吉慶','所求如意福綿綿','時運大開，凡事順遂。功名可成，財利自來。'],
+['上吉','春風一夜百花開','好事臨門喜自來','莫問前途多少路','青雲有路步高臺','喜事將至，貴人相助。所求之事宜積極把握。'],
+['中吉','溪水潺潺向海流','涓涓不息自無憂','但能守得心常靜','水到渠成事可求','凡事循序漸進，耐心可成，不宜急躁。'],
+['中平','山前古木半凋零','又見新枝發嫩青','舊事已隨流水去','且將心事託神靈','舊去新來。宜放下過去，重新出發。'],
+['上上','金烏東起照乾坤','福祿雙全滿戶門','積善人家多慶事','榮華富貴蔭兒孫','福祿雙全，家運昌隆。行善積德，福澤綿延。'],
+['下下','烏雲蔽月夜沉沉','獨步山林路難尋','且待天明風雨過','莫將妄念亂心神','時運暫低，宜守不宜進。靜待時機，謹言慎行。'],
+['中吉','船到江心逆浪生','掌舵須穩莫心驚','順流自有風帆助','一路平安到岸行','途中稍有波折，沉著應對，終能平安。'],
+['上吉','千里姻緣一線牽','月下老人笑開顏','良緣自有天安排','花好月圓在眼前','姻緣和合，感情順遂。單身者良緣將近。'],
+['中平','竹籬茅舍度春秋','淡泊心安萬事休','莫羨他人高樓好','知足常樂勝封侯','知足守分，平安是福，不宜貪求。'],
+['上上','魚躍龍門化作龍','一朝得志上天宮','十年寒窗今日報','金榜題名耀祖宗','功名大吉，考試、升遷皆有望。'],
+['下','花開花謝本無常','莫為浮名費思量','且把心田勤灌溉','來年自有好風光','目前不宜強求。修身養性，來日方長。'],
+['中吉','一盞明燈照夜行','前途雖遠亦分明','腳踏實地休回首','自有貴人引路程','方向正確，持之以恆，自有貴人提攜。'],
+['上吉','財源滾滾似江河','生意興隆福運多','勤儉持家須謹記','莫因得意便蹉跎','財運亨通。宜勤儉守成，勿因順境而怠惰。'],
+['中平','霧鎖山頭看不清','行人且慢莫前行','待得日高雲散後','自然大道見光明','事情尚未明朗，宜觀望等待，不宜貿然決定。'],
+['上上','慈雲普照福星臨','災退病除喜事頻','一點誠心通天地','神明庇佑保安身','平安大吉。病者漸癒，家宅安寧。'],
+['下下','逆風行舟力難支','事多阻滯費心思','不如暫且收帆住','留得青山待後時','諸事不順，宜暫停腳步，保守為上。'],
+['中吉','寒梅耐冷傲霜開','苦盡甘來運轉回','莫嘆眼前多風雪','春風不久便吹來','先苦後甘，困境即將過去。'],
+['上吉','鳳凰棲處有梧桐','貴人相遇喜相逢','攜手同心齊努力','事業興隆步步通','遇貴人、得合作，合夥事業有成。'],
+['中平','秋月雖明夜漸涼','凡事三思再主張','言多必失宜謹慎','退一步時路更長','宜謹言慎行，凡事多思量，忍讓為上。'],
+['上上','旭日東昇萬象新','春光滿地喜臨門','所謀所願皆如意','福壽康寧樂滿身','諸事大吉，心想事成。'],
+['中吉','小舟輕過萬重山','雖有險灘亦等閒','只要心中存善念','平安到處笑開顏','雖有小阻礙，終能平安度過。心存善念為要。'],
+['下','鏡裡看花水裡月','看來近在卻難攀','勸君莫把虛名戀','腳踏實地自心安','所求恐為虛幻，宜務實，勿好高騖遠。'],
+['中吉','種下良田待雨來','耕耘不怠自花開','今朝汗水明朝果','倉廩豐盈笑滿懷','努力耕耘必有收穫，只是需要時間。'],
+['上吉','一帆風順渡長江','兩岸青山送吉祥','出外求財多利益','歸來滿載喜洋洋','出外大吉，求財、旅行、遷居皆順利。']];
+const cnNum=n=>{const d='〇一二三四五六七八九';if(n<=10)return n===10?'十':d[n];if(n<20)return '十'+d[n-10];return d[Math.floor(n/10)]+'十'+(n%10?d[n%10]:'');};
+const kqG=new THREE.Group();kqG.position.set(ALTAR.x,ALTAR.y+2.08+1.0,ALTAR.z+1.15);kqG.visible=false;world.add(kqG);
+const kqTube=new THREE.Group();kqG.add(kqTube);
+const bamM=paintMat(0xc89a50,{roughness:.45}),stickM=paintMat(0xe8c890,{roughness:.5});
+{mesh(new THREE.CylinderGeometry(.42,.38,1.5,28,1,true),new THREE.MeshStandardMaterial({color:0xc89a50,roughness:.45,side:THREE.DoubleSide,bumpMap:wtL,bumpScale:.02}),0,0,0,kqTube);
+  mesh(new THREE.CircleGeometry(.38,28),bamM,0,-.75,0,kqTube).rotation.x=Math.PI/2;
+  for(const y of[-.55,.55])mesh(new THREE.TorusGeometry(.42,.035,8,32),M.red,0,y,0,kqTube).rotation.x=Math.PI/2;
+  const lt=canvasTex(64,96,(c)=>{c.fillStyle='#b01818';c.fillRect(0,0,64,96);c.strokeStyle='#f0c25a';c.lineWidth=3;c.strokeRect(4,4,56,88);c.fillStyle='#f6d66a';c.font='900 44px "Noto Serif TC",serif';c.textAlign='center';c.textBaseline='middle';c.fillText('籤',32,48);});
+  mesh(new THREE.PlaneGeometry(.32,.48),new THREE.MeshStandardMaterial({map:lt,roughness:.6}),0,0,.425,kqTube);
+  const sg=new THREE.BoxGeometry(.05,1.7,.014);for(let i=0;i<34;i++){const a=rand()*6.283,r=Math.sqrt(rand())*.3;const s=mesh(sg,stickM,Math.cos(a)*r,.1+rand()*.25,Math.sin(a)*r,kqTube);s.rotation.set(R(-.12,.12),rand()*3,R(-.12,.12));}}
+const kqStickTex=canvasTex(32,256,(c)=>{c.fillStyle='#e8c890';c.fillRect(0,0,32,256);});
+const kqStick=new THREE.Group();kqG.add(kqStick);kqStick.visible=false;
+mesh(new THREE.BoxGeometry(.07,1.9,.018),[stickM,stickM,stickM,stickM,new THREE.MeshBasicMaterial({map:kqStickTex}),stickM],0,0,0,kqStick);
+const kqStickGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex,color:0xffe0a0,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0}));kqStickGlow.scale.set(1.2,2.6,1);kqStick.add(kqStickGlow);
+function drawStickTex(n){const c=kqStickTex.userData.c,g=c.getContext('2d');g.fillStyle='#e8c890';g.fillRect(0,0,32,256);g.fillStyle='#b01818';g.fillRect(0,0,32,40);
+  g.fillStyle='#8a1010';g.font='900 22px "Noto Serif TC",serif';g.textAlign='center';g.textBaseline='middle';const t='第'+cnNum(n)+'籤';[...t].forEach((ch,i)=>g.fillText(ch,16,64+i*26));kqStickTex.needsUpdate=true;}
+// 筊杯
+const jiaoGeo=(()=>{const dome=new THREE.SphereGeometry(1,28,12,0,Math.PI*2,0,Math.PI/2),cap=new THREE.CircleGeometry(1,28);cap.rotateX(Math.PI/2);
+  [dome,cap].forEach(g=>{g.scale(.55,.24,.28);const p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i);p.setZ(i,p.getZ(i)-.55*x*x);}g.computeVertexNormals();});return [dome,cap];})();
+const jiao=[0,1].map(()=>{const g=new THREE.Group();mesh(jiaoGeo[0],new THREE.MeshStandardMaterial({color:0xb81c18,roughness:.3,metalness:.1}),0,0,0,g);
+  mesh(jiaoGeo[1],new THREE.MeshStandardMaterial({color:0xd8584a,roughness:.55}),0,0,0,g);g.visible=false;SH(g);world.add(g);return g;});
+const kq={on:false,phase:'',t:0,n:0,res:'',prevClose:false,from:[],to:[],spin:[],flatUp:[]};
+function rattle(dur){const a=aud();if(!a)return;for(let i=0;i<dur*18;i++){const t=a.currentTime+i/18+Math.random()*.03;const b=a.createBuffer(1,a.sampleRate*.03,a.sampleRate),d=b.getChannelData(0);for(let k=0;k<d.length;k++)d[k]=(Math.random()*2-1)*Math.pow(1-k/d.length,4);
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=b;f.type='bandpass';f.frequency.value=1800+Math.random()*1600;f.Q.value=4;g.gain.value=.35;s.connect(f);f.connect(g);g.connect(a.destination);s.start(t);}}
+function knock(d=0){tone(330,d,.12,.12,'triangle');tone(520,d+.01,.08,.06,'triangle');}
+const kqCard=document.getElementById('kqCard'),kqToast=document.getElementById('kqToast');
+function toast(t,ms=1600){kqToast.textContent=t;kqToast.style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>kqToast.style.opacity=0,ms);}
+function setClose(on){closeUp=on;bAltar.classList.toggle('on',on);if(on){tRad=portrait?17:11.5;tPhi=1.22;tTheta=Math.round(tTheta/6.2832)*6.2832;auto=false;bAuto.classList.remove('on');}else{tRad=portrait?120:92;tPhi=1.18;}}
+function startKq(){if(kq.on&&kq.phase!=='done')return;kqCard.classList.remove('show');kq.prevClose=kq.on?kq.prevClose:closeUp;kq.on=true;kq.phase='shake';kq.t=0;kq.n=1+Math.floor(Math.random()*QIAN.length);
+  setClose(true);kqG.visible=true;kqStick.visible=false;kqTube.rotation.set(0,0,0);jiao.forEach(j=>j.visible=false);drawStickTex(kq.n);rattle(2);toast('🙏 誠心默念所求之事…',2000);}
+function endKq(){kq.on=false;kq.phase='';kqG.visible=false;jiao.forEach(j=>j.visible=false);kqCard.classList.remove('show');setClose(kq.prevClose);}
+function showCard(){const q=QIAN[kq.n-1];const lv=q[0];
+  document.getElementById('kqHead').innerHTML=`雲上禪寺靈籤<br><b>第${cnNum(kq.n)}籤</b>`;
+  const lvEl=document.getElementById('kqLv');lvEl.textContent=lv;lvEl.className='lv '+(lv.startsWith('上')?'good':lv.startsWith('下')?'bad':'mid');
+  document.getElementById('kqPoem').innerHTML=q.slice(1,5).map(l=>`<span>${l}</span>`).join('');
+  document.getElementById('kqExp').textContent=q[5];kqCard.classList.add('show');
+  setAct(`抽到第${cnNum(kq.n)}籤 ${lv} 🎋`);burstSpark(new V3(kqG.position.x,kqG.position.y+2.5,kqG.position.z),40,lv.startsWith('上')?0xffe08a:0xfff0d0);
+  if(lv.startsWith('上'))[523,659,784,1047].forEach((f,i)=>tone(f,i*.12,1.8,.06));}
+function updKq(dt,t){if(!kq.on)return;kq.t+=dt;const T0=ALTAR.y+2.08;
+  if(kq.phase==='shake'){const k=Math.min(1,kq.t/.4);kqTube.rotation.x=k*.55+Math.sin(kq.t*28)*.12*k;kqTube.rotation.z=Math.sin(kq.t*21)*.08*k;kqTube.position.y=Math.abs(Math.sin(kq.t*14))*.06;
+    if(kq.t>2.1){kq.phase='stick';kq.t=0;kqStick.visible=true;kqStick.position.set(0,.2,.3);kqStick.rotation.set(.55,0,0);tone(1568,0,1.2,.05);tone(2093,.1,1.2,.04);}}
+  else if(kq.phase==='stick'){kqTube.rotation.x+=(0-kqTube.rotation.x)*.1;kqTube.rotation.z*=.9;const f=Math.min(1,kq.t/1.1),e=1-Math.pow(1-f,3);
+    kqStick.position.set(0,.2+e*2.3,.3+e*.5);kqStick.rotation.x=.55*(1-e);kqStick.rotation.y=e*Math.PI*2;kqStickGlow.material.opacity=e*.8;
+    if(kq.t>2.0){kq.phase='throw';kq.t=0;const r=Math.random();kq.res=r<.5?'sheng':r<.75?'xiao':'yin';
+      kq.flatUp=kq.res==='sheng'?(Math.random()<.5?[true,false]:[false,true]):kq.res==='xiao'?[true,true]:[false,false];
+      jiao.forEach((j,i)=>{j.visible=true;kq.from[i]=new V3(ALTAR.x+(i?.35:-.35),T0+.5,ALTAR.z+1.3);kq.to[i]=new V3(ALTAR.x+(i?.75:-.65),ALTAR.y+.02,ALTAR.z+2.4+(i?.2:-.1));
+        kq.spin[i]=new V3(R(8,14)*(rand()<.5?1:-1),R(2,6),R(6,10));});toast('擲筊請示…',1400);}}
+  else if(kq.phase==='throw'){const D=1.3;jiao.forEach((j,i)=>{const f=Math.min(1,kq.t/D);const a=kq.from[i],b=kq.to[i];
+      let y=a.y+(b.y-a.y)*f+Math.sin(f*Math.PI)*2.2;if(f>=1)y=b.y;j.position.set(a.x+(b.x-a.x)*f,y+(kq.flatUp[i]?.2:0),a.z+(b.z-a.z)*f);
+      const fin=kq.flatUp[i]?Math.PI:0,s=Math.pow(1-f,1.5);j.rotation.set(fin+kq.spin[i].x*s,kq.spin[i].y*s+(i?.4:-.3),kq.spin[i].z*s);});
+    if(kq.t>=1.3&&!kq.landed){kq.landed=true;knock(0);knock(.09);}
+    if(kq.t>2.0){kq.landed=false;kq.phase='done';kq.t=0;
+      if(kq.res==='sheng'){toast('聖筊 ✓ 神明應允',1800);setTimeout(()=>{if(kq.on)showCard();},900);}
+      else{toast(kq.res==='xiao'?'笑筊：神明笑而不答，請重新抽籤':'陰筊：神明不允，請重新抽籤',2600);
+        setTimeout(()=>{if(!kq.on)return;document.getElementById('kqHead').innerHTML=kq.res==='xiao'?'笑筊':'陰筊';const lvEl=document.getElementById('kqLv');lvEl.textContent='未獲應允';lvEl.className='lv mid';
+          document.getElementById('kqPoem').innerHTML='<span>心誠則靈</span><span>再求一籤</span>';document.getElementById('kqExp').textContent='沒有擲出聖筊，表示這支籤不是神明要給你的。請靜心再抽一次。';kqCard.classList.add('show');},1500);}}}
+  else if(kq.phase==='done'){kqStickGlow.material.opacity=.5+.3*Math.sin(t*3);}
+  if(kqStick.visible)kqStick.rotation.y+=kq.phase==='done'?dt*.6:0;}
+document.getElementById('kqAgain').onclick=()=>{kqCard.classList.remove('show');kq.phase='done';startKq();};
+document.getElementById('kqClose').onclick=()=>endKq();
+document.getElementById('kqCopy').onclick=()=>{const q=QIAN[kq.n-1];const txt=`雲上禪寺靈籤 第${cnNum(kq.n)}籤 ${q[0]}\n${q.slice(1,5).join('\n')}\n解曰：${q[5]}`;
+  const b=document.getElementById('kqCopy');try{navigator.clipboard.writeText(txt).then(()=>{b.textContent='已複製 ✓';setTimeout(()=>b.textContent='📋 複製籤詩',1500);},()=>{b.textContent='無法複製';});}catch(e){b.textContent='無法複製';}};
+document.getElementById('bKq').onclick=()=>startKq();
+const bMoreBtn=document.getElementById('bMore'),moreBox=document.getElementById('more');
+bMoreBtn.onclick=e=>{e.stopPropagation();moreBox.classList.toggle('open');bMoreBtn.classList.toggle('on',moreBox.classList.contains('open'));};
+moreBox.addEventListener('click',()=>setTimeout(()=>{moreBox.classList.remove('open');bMoreBtn.classList.remove('on');},250));
+renderer.domElement.addEventListener('pointerdown',()=>{moreBox.classList.remove('open');bMoreBtn.classList.remove('on');});
+// ---------- 設定：累積香客 & 預約樓主祈福 ----------
+// backend：Google Apps Script 網頁應用程式網址（部署方式見 README / apps-script.gs）
+// lineOA：LINE 官方帳號 ID（例如 '@abc1234'），沒有後端時用 LINE 送出預約
+const CFG={backend:'',lineOA:'@584enjys',lineAdd:'https://lin.ee/RXMywh9'};
+const visEl=document.getElementById('visits');
+function showVisits(n){if(!(n>0))return;visEl.innerHTML=`🙏 累積香客 <b>${Number(n).toLocaleString('zh-TW')}</b> 人`;visEl.style.display='';}
+(function(){if(!CFG.backend)return;let key='ct_visit_day',today=new Date().toISOString().slice(0,10),seen='';try{seen=localStorage.getItem(key)||'';}catch(e){}
+  const act=seen===today?'count':'hit';
+  fetch(CFG.backend+(CFG.backend.includes('?')?'&':'?')+'action='+act).then(r=>r.json()).then(d=>{showVisits(d.visits);if(act==='hit'){try{localStorage.setItem(key,today);}catch(e){}}}).catch(()=>{});})();
+const bkBox=document.getElementById('bkBox'),bkMsg=document.getElementById('bkMsg');
+document.getElementById('bBook').onclick=()=>{bkBox.classList.add('show');bkMsg.textContent='';const d=document.getElementById('bkDate');const t=new Date();d.min=t.toISOString().slice(0,10);if(!d.value)d.value=d.min;
+  const ty=document.getElementById('bkType');const map={wealth:'求財',love:'姻緣',fame:'功名',mazu:'收驚平安'};if(map[deity])ty.value=map[deity];
+  document.getElementById('bkSend').textContent=CFG.backend?'🙏 送出預約':CFG.lineOA?'💬 用 LINE 送出':'📋 複製預約內容';};
+document.getElementById('bkCancel').onclick=()=>bkBox.classList.remove('show');
+document.getElementById('bkForm').addEventListener('submit',e=>{e.preventDefault();
+  const v=id=>document.getElementById(id).value.trim();
+  const d={name:v('bkName').slice(0,20),type:v('bkType'),date:v('bkDate'),wish:v('bkWish').slice(0,200),contact:v('bkContact').slice(0,60),device:me.dev,region:me.region};
+  if(!d.name){bkMsg.textContent='請填寫稱呼';return;}if(!document.getElementById('bkOk').checked){bkMsg.textContent='請勾選同意，樓主才能為你祈福並聯繫';return;}
+  const text=`【預約樓主祈福】\n稱呼：${d.name}\n類別：${d.type}\n日期：${d.date}\n心願：${d.wish||'（未填）'}\n聯絡：${d.contact||'（未填）'}`;
+  const done=m=>{bkMsg.textContent=m;setAct('預約了樓主祈福 📅');burstSpark(new V3(0,BY+13,BZ),40,0xffe08a);[523,659,784].forEach((f,i)=>tone(f,i*.12,1.5,.06));};
+  const btn=document.getElementById('bkSend');
+  if(CFG.backend){btn.disabled=true;bkMsg.textContent='傳送中…';
+    fetch(CFG.backend,{method:'POST',body:JSON.stringify(d)}).then(r=>r.json()).then(r=>{btn.disabled=false;if(r&&r.ok){done(`已收到預約 🙏 樓主將於 ${d.date} 為「${d.name}」祈福`);document.getElementById('bkForm').reset();}else bkMsg.textContent='送出失敗，請稍後再試';})
+      .catch(()=>{btn.disabled=false;bkMsg.textContent='送出失敗，請稍後再試';});}
+  else if(CFG.lineOA){const a=document.createElement('a');a.href=`https://line.me/R/oaMessage/${encodeURIComponent(CFG.lineOA)}/?${encodeURIComponent(text)}`;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();done('已開啟 LINE，按下傳送即完成預約 🙏');}
+  else{try{navigator.clipboard.writeText(text).then(()=>done('已複製預約內容，請貼給樓主 🙏'),()=>{bkMsg.textContent='無法複製，請截圖傳給樓主';});}catch(err){bkMsg.textContent='無法複製，請截圖傳給樓主';}}
+});
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 
 // ---------- loop ----------
@@ -1377,7 +1584,7 @@ function tick(){
      const e=SW[k]*SW[k]*(3-2*SW[k]);ST[k].scale.setScalar(BS*Math.max(.001,e));ST[k].visible=SW[k]>.005;tr=Math.max(tr,SW[k]*(1-SW[k])*4);}
    if(SW[ak]<.05)tr=Math.max(tr,.8);flare.material.opacity=tr*.9;
    const bw=SW.vairo+SW.ksiti;halo.scale.setScalar(Math.max(.001,bw));ring2.scale.setScalar(Math.max(.001,bw));haloDisc.scale.setScalar(6*bw+.001);mandorla.scale.set(11*bw+.001,16*bw+.001,1);}
-  updFx(dt,t);
+  updFx(dt,t);updKq(dt,t);
   // altar incense & flames
   incenseTips.forEach(tp=>{tp.gl.material.opacity=.7+.3*Math.sin(t*7+tp.ph);});
   altarFlames.forEach((f,i)=>{f.scale.set(.35+.05*Math.sin(t*11+i),.6+.1*Math.sin(t*9+i*2),1);});
