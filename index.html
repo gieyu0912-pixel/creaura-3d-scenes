@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CREAURA AI · 3D 互動場景</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;900&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;min-height:100vh;font-family:"Noto Serif TC",serif;color:#fff;
+       background:radial-gradient(ellipse at 70% 20%,#ff8a6a33,transparent 50%),linear-gradient(160deg,#120d3a,#3a2a6a 60%,#1a1838);
+       display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;box-sizing:border-box}
+  h1{font-size:clamp(28px,6vw,48px);letter-spacing:.12em;margin:0 0 6px;text-shadow:0 0 24px rgba(255,180,120,.5)}
+  p.sub{opacity:.7;letter-spacing:.3em;margin:0 0 40px;font-size:13px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;width:100%;max-width:760px}
+  a.card{display:block;text-decoration:none;color:#fff;padding:28px 24px;border-radius:20px;border:1px solid rgba(255,255,255,.2);
+         background:rgba(255,255,255,.06);backdrop-filter:blur(8px);transition:transform .2s,border-color .2s}
+  a.card:hover{transform:translateY(-4px);border-color:rgba(255,210,150,.7)}
+  .emoji{font-size:40px}.t{font-size:24px;font-weight:900;margin:10px 0 6px;letter-spacing:.1em}.d{font-size:14px;opacity:.75;line-height:1.7}
+  footer{margin-top:40px;font-size:12px;opacity:.5;letter-spacing:.2em}
+</style>
+</head>
+<body>
+  <h1>3D 互動場景</h1>
+  <p class="sub">THREE.JS · SINGLE HTML · BY CREAURA AI</p>
+  <div class="grid">
+    <a class="card" href="floating-taipei/"><div class="emoji">🌃</div><div class="t">浮空台北</div><div class="d">夜空下的浮空島、台北 101、盤旋的青龍、天燈與跨年煙火。</div></a>
+    <a class="card" href="temple/"><div class="emoji">🛕</div><div class="t">雲上禪寺</div><div class="d">雲海山巔的佛寺：敲鐘、點蓮燈、晨曦／夜晚，求財、求姻緣、求功名。</div></a>
+  </div>
+  <footer>CREAURA AI</footer>
+</body>
+</html>
