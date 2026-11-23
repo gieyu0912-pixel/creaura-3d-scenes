@@ -56,6 +56,7 @@
       <button id="bAuto" class="on">自動環繞</button>
       <button id="bBell">🔔 敲鐘</button>
       <button id="bLamp">🪷 點蓮燈</button>
+      <button id="bSnd">🔇 自然音</button>
       <button id="bMode">🌙 夜晚</button>
       <button id="bAltar">🙏 供桌特寫</button>
       <button id="bFin">✨ 金身</button>
@@ -1221,6 +1222,71 @@ let lastTap=0;cv.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')ret
 const bAuto=document.getElementById('bAuto');bAuto.onclick=()=>{auto=!auto;bAuto.classList.toggle('on',auto);};
 document.getElementById('bBell').onclick=()=>{ringBell();setAct('敲響晨鐘 🔔');};
 document.getElementById('bLamp').onclick=()=>{for(let i=0;i<12;i++)spawnLamp();setAct('點了蓮燈 🪷');};
+
+// ---------- 自然環境音：溪流、鳥叫、蟲鳴、風鈴（即時合成） ----------
+const amb={on:false,started:false,master:null,timers:[],streamGs:[],bub:null};
+function ambStart(){const a=aud();if(!a)return;if(!amb.started){amb.started=true;
+  const master=a.createGain();master.gain.value=0;master.connect(a.destination);amb.master=master;
+  const len=a.sampleRate*5;const brown=a.createBuffer(2,len,a.sampleRate),white=a.createBuffer(1,len,a.sampleRate);
+  for(let ch=0;ch<2;ch++){const d=brown.getChannelData(ch);let l=0;for(let i=0;i<len;i++){const w=Math.random()*2-1;l=(l+.02*w)/1.02;d[i]=l*3.5;}}
+  {const d=white.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;}
+  const streamBus=a.createGain();streamBus.gain.value=.55;streamBus.connect(master);
+  const src=a.createBufferSource();src.buffer=brown;src.loop=true;
+  [[380,.7],[900,.9],[1900,.8],[3600,.5]].forEach(([f,q])=>{const bp=a.createBiquadFilter();bp.type='bandpass';bp.frequency.value=f;bp.Q.value=q;const g=a.createGain();g.gain.value=.5;src.connect(bp);bp.connect(g);g.connect(streamBus);amb.streamGs.push(g);});
+  const ws=a.createBufferSource();ws.buffer=white;ws.loop=true;const hp=a.createBiquadFilter();hp.type='bandpass';hp.frequency.value=2600;hp.Q.value=3;const bg=a.createGain();bg.gain.value=0;ws.connect(hp);hp.connect(bg);bg.connect(streamBus);amb.bub={g:bg,f:hp};
+  src.start();ws.start();
+  // 真實溪流錄音（stream.mp3，同目錄）；載入失敗則保留合成水聲
+  fetch('stream.mp3').then(r=>{if(!r.ok)throw new Error('no file');return r.arrayBuffer();})
+    .then(b=>new Promise((res,rej)=>{const p=a.decodeAudioData(b,res,rej);if(p&&p.then)p.then(res,rej);}))
+    .then(buf=>{const ch=buf.getChannelData(0);let s0=0,s1=ch.length-1;while(s0<ch.length-1&&Math.abs(ch[s0])<1e-4)s0++;while(s1>s0&&Math.abs(ch[s1])<1e-4)s1--;
+      const rs=a.createBufferSource();rs.buffer=buf;rs.loop=true;rs.loopStart=s0/buf.sampleRate;rs.loopEnd=(s1+1)/buf.sampleRate;
+      const rg=a.createGain();rg.gain.value=0;rs.connect(rg);rg.connect(master);rs.start(0,rs.loopStart);amb.realGain=rg;
+      const t=a.currentTime;rg.gain.linearRampToValueAtTime(.65,t+2.5);streamBus.gain.setValueAtTime(streamBus.gain.value,t);streamBus.gain.linearRampToValueAtTime(0,t+2.5);amb.real=true;})
+    .catch(()=>{});
+  const birdBus=a.createGain();birdBus.connect(master);amb.birdBus=birdBus;const bugBus=a.createGain();bugBus.connect(master);amb.bugBus=bugBus;const chimeBus=a.createGain();chimeBus.gain.value=.5;chimeBus.connect(master);amb.chimeBus=chimeBus;
+  const pan=(bus,p)=>{if(a.createStereoPanner){const n=a.createStereoPanner();n.pan.value=p;n.connect(bus);return n;}return bus;};
+  const note=(bus,t,dur,f0,f1,vol,type='sine',p=0)=>{const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+Math.min(.02,dur*.3));g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(pan(bus,p));o.start(t);o.stop(t+dur+.05);};
+  const birds=[
+    (t,p)=>{note(birdBus,t,.14,2500,3300,.05,'sine',p);note(birdBus,t+.15,.12,3300,2600,.045,'sine',p);},
+    (t,p)=>{for(let i=0;i<9;i++)note(birdBus,t+i*.045,.04,i%2?4200:3800,i%2?4000:4100,.03,'sine',p);},
+    (t,p)=>{note(birdBus,t,.25,3400,3350,.04,'sine',p);note(birdBus,t+.3,.32,2900,2800,.04,'sine',p);},
+    (t,p)=>{let tt=t;const n=4+Math.random()*3|0;for(let i=0;i<n;i++){const f=2000+Math.random()*1600;note(birdBus,tt,.09,f,f*(Math.random()<.5?1.25:.8),.04,'sine',p);tt+=.1+Math.random()*.05;}},
+    (t,p)=>{for(let i=0;i<3;i++){note(birdBus,t+i*.35,.18,1500,2200,.035,'triangle',p);}},
+  ];
+  const tick=()=>{if(!amb.on)return;const now=a.currentTime,n=typeof night==='number'?night:0;
+    amb.streamGs.forEach(g=>g.gain.setTargetAtTime(.25+Math.random()*.75,now,.12));
+    amb.bub.g.gain.setTargetAtTime(Math.random()<.35?Math.random()*.25:0,now,.04);amb.bub.f.frequency.setTargetAtTime(1800+Math.random()*2400,now,.05);
+    const day=1-n;
+    if(Math.random()<.11*day+.01){const p=Math.random()*1.6-.8,b=birds[Math.random()*birds.length|0];b(now+.05,p);if(Math.random()<.4)b(now+.6+Math.random()*.4,p);}
+    if(Math.random()<.025*n){const t=now+.05,p=Math.random()*1.4-.7;note(birdBus,t,.45,420,390,.05,'sine',p);note(birdBus,t+.6,.7,410,370,.05,'sine',p);}
+    const crick=.2+.8*n;
+    for(let c=0;c<3;c++)if(Math.random()<.22*crick){const t=now+Math.random()*.1,f=4100+c*380,p=c-1;for(let k=0;k<3+(Math.random()*3|0);k++)note(bugBus,t+k*.032,.022,f,f,.018*crick+.004,'sine',p*.6);}
+    if(day>.5&&Math.random()<.04){const t=now,o=a.createOscillator(),g=a.createGain(),am=a.createOscillator(),ag=a.createGain();o.type='sawtooth';o.frequency.value=5200;am.frequency.value=48;ag.gain.value=.004;
+      const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=5200;f.Q.value=6;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.006,t+1);g.gain.linearRampToValueAtTime(0,t+3);
+      am.connect(ag);ag.connect(g.gain);o.connect(f);f.connect(g);g.connect(bugBus);o.start(t);am.start(t);o.stop(t+3.1);am.stop(t+3.1);}
+    if(Math.random()<.03){const t=now;const base=[1568,1760,2093,2349,2637][Math.random()*5|0];for(let k=0;k<2+(Math.random()*3|0);k++){const tt=t+k*(.12+Math.random()*.2),f=base*(1+Math.random()*.06);
+      note(chimeBus,tt,2.2,f,f,.025,'sine',Math.random()-.5);note(chimeBus,tt,1.2,f*2.76,f*2.76,.008,'sine',0);}}
+  };
+  amb.timers.push(setInterval(tick,140));}
+  amb.on=true;const t=a.currentTime;amb.master.gain.cancelScheduledValues(t);amb.master.gain.setValueAtTime(amb.master.gain.value,t);amb.master.gain.linearRampToValueAtTime(.9,t+2.5);updSndBtn();}
+function ambStop(){amb.on=false;if(amb.master&&actx){const t=actx.currentTime;amb.master.gain.cancelScheduledValues(t);amb.master.gain.setValueAtTime(amb.master.gain.value,t);amb.master.gain.linearRampToValueAtTime(0,t+1);}updSndBtn();}
+const bSnd=document.getElementById('bSnd');
+function updSndBtn(){bSnd.textContent=amb.on?'🔈 自然音':'🔇 自然音';bSnd.classList.toggle('on',amb.on);}
+let ambUserOff=false;
+bSnd.onclick=e=>{unlockAudio();if(amb.on&&actx&&actx.state==='running'){ambUserOff=true;ambStop();}else{ambUserOff=false;ambStart();}};
+// iOS／手機音訊解鎖：在 click/touchend 中恢復 AudioContext，並播放無聲 <audio> 讓靜音開關不擋住網頁音效
+let unlockEl=null;
+function silentWav(){const n=8000,b=new Uint8Array(44+n),dv=new DataView(b.buffer);const w=(o,t)=>{for(let i=0;i<t.length;i++)b[o+i]=t.charCodeAt(i);};
+  w(0,'RIFF');dv.setUint32(4,36+n,true);w(8,'WAVE');w(12,'fmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,8000,true);dv.setUint32(28,8000,true);dv.setUint16(32,1,true);dv.setUint16(34,8,true);w(36,'data');dv.setUint32(40,n,true);b.fill(128,44);
+  let s='';for(let i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return 'data:audio/wav;base64,'+btoa(s);}
+function unlockAudio(){const a=aud();if(!a)return;try{const r=a.resume();if(r&&r.catch)r.catch(()=>{});}catch(e){}
+  try{const bf=a.createBuffer(1,1,22050),src=a.createBufferSource();src.buffer=bf;src.connect(a.destination);src.start(0);}catch(e){}
+  try{if(!unlockEl){unlockEl=new Audio(silentWav());unlockEl.loop=true;unlockEl.setAttribute('playsinline','');unlockEl.volume=1;}const p=unlockEl.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
+let gestured=false;
+const onGesture=e=>{unlockAudio();if(!gestured){gestured=true;if(e.target!==bSnd&&!amb.on&&!ambUserOff)ambStart();}
+  setTimeout(()=>{if(actx&&actx.state!=='running'&&amb.on)bSnd.textContent='🔇 點我開聲音';else updSndBtn();},400);};
+['click','touchend','keydown'].forEach(ev=>addEventListener(ev,onGesture,true));
 const bMode=document.getElementById('bMode');bMode.onclick=()=>{nightT=nightT?0:1;bMode.textContent=nightT?'🌅 晨曦':'🌙 夜晚';updateSub();};
 let deity='buddha';
 const SUBS={mazu:'天上聖母 · 收驚保平安',wealth:'財神爺 · 招財進寶',love:'月下老人 · 千里姻緣一線牽',fame:'文昌帝君 · 金榜題名'};
@@ -1261,7 +1327,7 @@ function renderOnline(){
     return `<div class="row"><div class="ic">${devIcon(d)}</div><div><div><b>${esc(d)}</b>${p.isMe?(p.sameTab?'<span class="me">你</span>':'<span class="me">你（另一分頁）</span>'):''}</div><div class="sm">📍 ${esc(r)} · 🙏 ${esc(clip(q.wish||'禮佛',8))}</div></div></div>`;});
   document.getElementById('onList').innerHTML=rows.join('');
   document.getElementById('onFeed').innerHTML=feed.length?feed.map(f=>`<div>${esc(f.txt)}</div>`).join(''):'<div style="opacity:.5">等待第一炷香…</div>';
-  document.getElementById('onNote').textContent=room?'':'分享此頁給親友，在 Claude 中一起開啟即可看到彼此。';
+  document.getElementById('onNote').textContent=room?'':'分享此頁給親友，在喜悅中一起開啟即可看到彼此。';
 }
 const onBox=document.getElementById('online');
 if(innerWidth<700)onBox.classList.add('min');
