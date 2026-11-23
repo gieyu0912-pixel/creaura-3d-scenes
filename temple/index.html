@@ -24,6 +24,22 @@
   button.on{background:rgba(220,150,60,.5);border-color:rgba(255,220,160,.8)}
   .hint{font-size:12px;opacity:.65;letter-spacing:.1em;margin-bottom:8px}
   #eye{position:fixed;right:calc(env(safe-area-inset-right) + 14px);top:calc(env(safe-area-inset-top) + 14px);padding:8px 12px}
+  #online{position:fixed;right:calc(env(safe-area-inset-right) + 14px);top:calc(env(safe-area-inset-top) + 62px);width:230px;max-width:62vw;z-index:5;
+     background:rgba(30,20,50,.55);border:1px solid rgba(255,230,180,.3);border-radius:16px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:12.5px;overflow:hidden}
+  #online .hd{display:flex;align-items:center;gap:6px;padding:9px 12px;cursor:pointer;font-weight:900;letter-spacing:.08em}
+  #online .dot{width:8px;height:8px;border-radius:50%;background:#5dff8a;box-shadow:0 0 8px #5dff8a;animation:pl 1.6s infinite}
+  @keyframes pl{50%{opacity:.35}}
+  #online .bd{max-height:46vh;overflow:auto;padding:0 10px 10px}
+  #online.min .bd{display:none}
+  #online .row{display:flex;gap:8px;align-items:flex-start;padding:7px 4px;border-top:1px solid rgba(255,255,255,.08)}
+  #online .row .ic{font-size:18px;line-height:1}
+  #online .row b{font-weight:700}#online .row .me{color:#ffd27a;font-size:11px;margin-left:4px}
+  #online .row .sm{opacity:.7;font-size:11px;margin-top:2px}
+  #online .feed{margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,230,180,.3)}
+  #online .feed div{opacity:.85;padding:3px 0;animation:fi .5s}
+  @keyframes fi{from{opacity:0;transform:translateX(10px)}}
+  #online .note{opacity:.55;font-size:11px;padding:6px 4px 0;line-height:1.5}
+  #ui.hide ~ #online{opacity:0;pointer-events:none}
   #err{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px}
 </style>
 </head>
@@ -32,7 +48,7 @@
   <div><h1>雲上禪寺</h1><div class="sub" id="sub">大日如來 · 光明遍照</div></div>
   <div>
     <div class="bar" id="wish" style="margin-bottom:8px">
-      <button data-d="buddha" class="on">🪷 禮佛</button><button data-d="wealth">💰 求財</button><button data-d="love">💞 求姻緣</button><button data-d="fame">📜 求功名</button>
+      <button data-d="buddha" class="on">🪷 禮佛</button><button data-d="wealth">💰 求財</button><button data-d="love">💞 求姻緣</button><button data-d="fame">📜 求功名</button><button data-d="mazu">🌊 天上聖母</button>
       <button id="bOffer" class="offer" style="display:none"></button>
     </div>
     <div class="hint">拖曳旋轉 · 雙指縮放 · 點兩下敲鐘 · 選擇求願後按金色按鈕供奉</div>
@@ -48,6 +64,7 @@
 </div>
 <button id="eye" title="隱藏介面">👁</button>
 <div id="carve" style="position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 86px);transform:translateX(-50%);font-size:13px;letter-spacing:.2em;opacity:.8;pointer-events:none">🪵 神像雕刻中…</div>
+<div id="online"><div class="hd" id="onHd"><span class="dot"></span><span id="onCount">即時在線信徒</span><span style="margin-left:auto;opacity:.6" id="onTog">▾</span></div><div class="bd"><div id="onList"></div><div class="feed" id="onFeed"></div><div class="note" id="onNote"></div></div></div>
 <div id="err">3D 函式庫載入失敗，請重新整理頁面。</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -526,10 +543,17 @@ SG.fame=()=>{const c={RB:P(0x1f5f8a),R2:P(0x123a5a),TR:P(0xe8b040),BK:P(0x1a1716
       sleeveArm(S,c.RB,[-1.95,6.3,0],[-2.5,5.0,.4],[-1.3,4.2,1.6],.6);S.add(E(-.75,4.15,2.0,.32,.24,.3),c.SK,.06);},
     {brow:P(0x1a1716),beard:c.BK,len:2.1,hair:(S,c)=>{S.add(Box(0,10.2,-.08,.98,.8,.98,.35),c.BK,.05);S.add(Box(0,10.95,-.12,1.15,.08,.75,.04),c.BK,.04);
       S.paint(cut(E(0,9.1,-.08,1.12,1.26,1.16),(x,y,z)=>(9.55-(z<0?-z*.9:0))-y),c.BK);}});};
+SG.mazu=()=>{const c={RB:P(0xc8282a),R2:P(0x7a1414),TR:P(0xe8b040),BK:P(0x1a1716),SK:P(0xf3cfb0),JD:P(0xe8b040),LP:P(0xc85a62),WH:P(0xf6f2ea),HR:P(0x1a1716)};
+  const hl=(x,y,z)=>(9.5-(z<0?-z*.9:0)-x*x*.15)-y;
+  return deityDef(c,(S,c)=>{for(const s of[1,-1]){sleeveArm(S,c.RB,[s*1.95,6.3,0],[s*2.45,5.0,.4],[s*.95,5.35,1.5],.62);S.add(E(s*.3,5.62,1.74,.26,.3,.26),c.SK,.06);}
+      S.add(Ring(0,6.78,0,1.7,.2,.82,0),c.TR,.15);for(let k=0;k<12;k++){const a=k/12*Math.PI*2;S.add(E(Math.sin(a)*1.9,6.6-Math.abs(Math.cos(a))*.12,Math.cos(a)*1.42,.4,.17,.34),c.TR,.12);}},
+    {brow:P(0x1a1716),beard:null,len:0,hair:(S,c)=>{S.add(cut(E(0,9.12,-.14,1.14,1.28,1.18),hl),c.BK,.05);S.add(E(0,9.35,-1.05,.62,.6,.45),c.BK,.15);}});};
+
 }
 
 return {SC,SG};}
 
+let woodFinish=true;
 const sGold=new THREE.MeshStandardMaterial({color:0xffc94a,vertexColors:true,metalness:.8,roughness:.28,envMap:envTex,emissive:0x3a2200,emissiveIntensity:.5});envMats.push(sGold);
 const sWood=new THREE.MeshStandardMaterial({vertexColors:true,map:wtL,bumpMap:wtL,bumpScale:.03,roughness:.42,emissive:0x1a0c04,emissiveIntensity:.5});
 const grainLight=woodTex(0xf8f4ee,0xddd2c2,5);
@@ -599,7 +623,7 @@ function prepFinish(grp){grp.traverse(o=>{if(!o.isMesh||o.userData.fin)return;co
   if(m.isMeshBasicMaterial||KEEP.has(m))w=m;else if(m===robeMat)w=woodRobe;else if(m.color&&m.color.getHex()<0x9a6a30&&m!==M.gold)w=woodDark;else w=woodV;
   o.userData.fin={gold:m,wood:w};});}
 prepFinish(vairo);prepFinish(ksiti);
-let woodFinish=true;
+woodFinish=true;
 function applyFinish(){[vairo,ksiti].forEach(g=>g.traverse(o=>{if(o.userData.fin)o.material=woodFinish?o.userData.fin.wood:o.userData.fin.gold;}));}
 applyFinish();
 // 共用光環
@@ -760,7 +784,24 @@ deityG.fame=new THREE.Group();
   mesh(new THREE.BoxGeometry(.2,.55,.02),paintMat(0xb02020),-.4,4.25,2.47,g);
   loadSculpt('fame',g,'paint');
 }
-['wealth','love','fame'].forEach(k=>{const g=deityG[k];g.position.set(0,BY,BZ);g.scale.setScalar(.001);g.visible=false;SH(g);world.add(g);});
+
+// 天上聖母
+deityG.mazu=new THREE.Group();
+{const g=deityG.mazu;chair(g);
+  mesh(new THREE.CylinderGeometry(1.03,1.1,.75,24),gilt,0,9.95,-.1,g);
+  for(const s of[1,-1]){const w=mesh(new THREE.SphereGeometry(1,12,8).scale(.55,.28,.05),gilt,s*1.12,10.12,-.15,g);w.rotation.y=s*Math.PI/2;w.rotation.z=s*.35;}
+  mesh(new THREE.SphereGeometry(.13,10,8),new THREE.MeshBasicMaterial({color:0xff3a4a}),0,10.0,1.02,g);
+  const brd=new THREE.Group();brd.position.set(0,10.45,-.1);brd.rotation.x=.07;g.add(brd);
+  mesh(new THREE.BoxGeometry(2.3,.1,2.7),blackM,0,0,0,brd);mesh(new THREE.BoxGeometry(2.38,.05,2.78),gilt,0,-.07,0,brd);
+  const beadGeo=new THREE.SphereGeometry(.048,8,6),bm=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.25,metalness:.2});
+  const N=2*11*9,bi=new THREE.InstancedMesh(beadGeo,bm,N);const d=new THREE.Object3D(),cc=new THREE.Color();let n=0;const bc=[0xe8202a,0xffffff,0x3aa86a,0x3a78e8,0xffd24a];
+  for(const zs of[1.3,-1.3])for(let i=0;i<11;i++)for(let k=0;k<9;k++){d.position.set(-1.0+i*.2,-.1-k*.11,zs);d.updateMatrix();bi.setMatrixAt(n,d.matrix);cc.setHex(bc[k%bc.length]);bi.setColorAt(n,cc);n++;}
+  brd.add(bi);
+  const tab=mesh(new THREE.BoxGeometry(.44,2.1,.07),paintMat(0xf0e6c8,{roughness:.35}),0,6.55,1.84,g);tab.rotation.x=-.12;
+  for(const s of[1,-1])mesh(new THREE.SphereGeometry(.07,8,6),gilt,s*1.08,8.55,.05,g);
+  loadSculpt('mazu',g,'paint');
+}
+['wealth','love','fame','mazu'].forEach(k=>{const g=deityG[k];g.position.set(0,BY,BZ);g.scale.setScalar(.001);g.visible=false;SH(g);world.add(g);});
 
 // 供桌上的對應供品（按下供奉後出現）
 const altarExtra={};
@@ -773,6 +814,10 @@ const altarExtra={};
     mesh(new THREE.LatheGeometry(vp,20),paintMat(0xe8f0ff,{bumpScale:0,roughness:.2}),0,T0,.95,g);
     for(let k=0;k<7;k++){const a=k/7*6.283,sp=k?.35:0;const e=new V3(Math.cos(a)*sp,T0+1.7+rand()*.4-sp*.5,.95+Math.sin(a)*sp);tube([new V3(0,T0+1,.95),new V3(e.x*.5,T0+1.4,.95+(e.z-.95)*.5),e],.02,new THREE.MeshStandardMaterial({color:0x3f7a2a}),g,false,8);
       const s=new THREE.Sprite(new THREE.SpriteMaterial({map:lilyTex,transparent:true,depthWrite:false}));s.position.copy(e);s.scale.setScalar(.65);g.add(s);}}
+  altarExtra.mazu=mk();{const g=altarExtra.mazu;const ft=canvasTex(64,128,(c)=>{c.fillStyle='#f2cf5a';c.fillRect(0,0,64,128);c.strokeStyle='#b01818';c.lineWidth=3;c.strokeRect(4,4,56,120);c.fillStyle='#b01818';c.font='900 26px serif';c.textAlign='center';c.fillText('平',32,50);c.fillText('安',32,86);});
+    const f=mesh(new THREE.PlaneGeometry(.45,.9),new THREE.MeshStandardMaterial({map:ft,side:THREE.DoubleSide,roughness:.7}),-.35,T0+.5,.85,g);f.rotation.x=-.15;
+    mesh(new THREE.BoxGeometry(.5,.08,.25),M.red,-.35,T0+.04,.85,g);
+    const bp=[[0,0],[.18,0],[.22,-.1],[.24,-.35],[.3,-.42]].map(([x,y])=>new THREE.Vector2(x,y));mesh(new THREE.LatheGeometry(bp,20),gilt,.5,T0+.45,.95,g);mesh(new THREE.CylinderGeometry(.04,.04,.5,8),gilt,.5,T0+.68,.95,g);mesh(new THREE.SphereGeometry(.07,8,6),gilt,.5,T0+.95,.95,g);}
   altarExtra.fame=mk();{const g=altarExtra.fame;
     mesh(new THREE.BoxGeometry(.9,.12,.6),paintMat(0x2a2a30,{roughness:.3}),-.55,T0+.06,.95,g);mesh(new THREE.BoxGeometry(.5,.04,.3),new THREE.MeshStandardMaterial({color:0x050505,roughness:.05}),-.55,T0+.13,.9,g);
     mesh(new THREE.BoxGeometry(.12,.5,.12),paintMat(0x1a1410),-.25,T0+.37,1.15,g).rotation.z=.2;
@@ -837,6 +882,7 @@ const rodTop=new THREE.Group(),rodBot=new THREE.Group();scrollG.add(rodTop,rodBo
 for(const r of[rodTop,rodBot]){const c=mesh(new THREE.CylinderGeometry(.28,.28,10,16),rodM,0,0,0,r);c.rotation.z=Math.PI/2;for(const s of[1,-1])mesh(new THREE.SphereGeometry(.34,12,10),gilt,s*5.1,0,0,r);}
 rodTop.position.y=.1;
 const cord=tube([new V3(-3.5,.2,0),new V3(0,2.2,0),new V3(3.5,.2,0)],.05,new THREE.MeshBasicMaterial({color:0xc02020}),scrollG,false,20);
+const scrollHalo=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex,color:0xffd88a,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0}));scrollHalo.position.set(0,-9,-.6);scrollHalo.scale.set(16,28,1);scrollG.add(scrollHalo);
 const brushG=new THREE.Group();scrollG.add(brushG);
 {const bam=paintMat(0xc8a060,{roughness:.4});mesh(new THREE.CylinderGeometry(.14,.12,3.6,12),bam,0,2.2,0,brushG);
   for(let k=0;k<3;k++)mesh(new THREE.TorusGeometry(.14,.03,6,12),paintMat(0x8a6a30),0,1.2+k*1.1,0,brushG).rotation.x=Math.PI/2;
@@ -863,7 +909,7 @@ function composite(){const p=paperC.getContext('2d'),t=tmpC.getContext('2d');p.d
   t.globalCompositeOperation='destination-in';t.drawImage(maskC,0,0);t.globalCompositeOperation='source-over';p.drawImage(tmpC,0,0);paperTex.needsUpdate=true;}
 function offerFame(){altarExtra.fame.visible=true;if(ws.on&&ws.phase!=='out')return;
   ws.idiom=IDIOMS[Math.floor(Math.random()*IDIOMS.length)];
-  const go=()=>{maskC.getContext('2d').clearRect(0,0,PW,PH);drawText();ws.pts=brushPath();ws.idx=0;ws.last=null;ws.on=true;ws.phase='unroll';ws.t=0;ws.u=0;scrollG.visible=true;scrollG.scale.setScalar(1);paperMesh.material.opacity=1;composite();};
+  const go=()=>{maskC.getContext('2d').clearRect(0,0,PW,PH);drawText();ws.pts=brushPath();ws.idx=0;ws.last=null;ws.on=true;ws.phase='unroll';ws.t=0;ws.u=0;ws.sealed=false;scrollG.visible=true;scrollG.position.set(0,24,2);scrollG.scale.setScalar(1);paperMesh.material.opacity=1;scrollHalo.material.opacity=0;brushG.visible=true;composite();};
   if(document.fonts&&document.fonts.load)document.fonts.load('700 172px "LXGW WenKai TC"',ws.idiom+'文昌帝君敕書').then(go,go);else go();
   burstSpark(altarTop(),30,0x9fd8ff);tone(196,0,3,.12);tone(294,.05,3,.06);}
 function updScroll(dt,t){if(!ws.on)return;ws.t+=dt;
@@ -881,12 +927,79 @@ function updScroll(dt,t){if(!ws.on)return;ws.t+=dt;
     if(ws.idx>=ws.pts.length-1){ws.phase='seal';ws.t=0;}}
   else if(ws.phase==='seal'){brushG.position.lerp(toLocal(PW/2+260,PH*.45,2),.08);if(ws.t>.5&&!ws.sealed){drawSeal();ws.sealed=true;const w=new V3();paperMesh.getWorldPosition(w);burstSpark(w.add(new V3(0,-9,0)),50,0xffe08a);
       [784,988,1175,1568].forEach((f,i)=>tone(f,i*.12,1.6,.07));}
-    if(ws.t>6.5){ws.phase='out';ws.t=0;}}
-  else if(ws.phase==='out'){scrollG.position.y=24+ws.t*ws.t*6;paperMesh.material.opacity=Math.max(0,1-ws.t/1.6);scrollG.scale.setScalar(Math.max(.01,1-ws.t*.3));
-    if(ws.t>1.6){ws.on=false;scrollG.visible=false;scrollG.position.y=24;ws.sealed=false;}}
+    if(ws.t>2.8){ws.phase='out';ws.t=0;const w=new V3();brushG.getWorldPosition(w);burstSpark(w,30,0xfff0b0);brushG.visible=false;
+      [523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,i*.16,2.2,.06));tone(131,0,4,.08);}}
+  else if(ws.phase==='out'){const D=7,f=Math.min(1,ws.t/D),e=f*f*(3-2*f)*.35+f*f*.65;
+    scrollG.position.y=24+e*70;scrollG.position.x=Math.sin(ws.t*1.3)*1.2*f;scrollG.scale.setScalar(Math.max(.05,1-f*.65));
+    paperMesh.material.opacity=f<.75?1:Math.max(0,1-(f-.75)/.25);scrollHalo.material.opacity=Math.min(1,ws.t*1.5)*.85*(f<.8?1:Math.max(0,1-(f-.8)/.2));
+    scrollHalo.scale.set(16+Math.sin(ws.t*4)*1.2,28,1);
+    ws.trail=(ws.trail||0)+dt;if(ws.trail>.08&&f<.9){ws.trail=0;const w=new V3();paperMesh.getWorldPosition(w);w.y-=18*scrollG.scale.y*R(.2,1);w.x+=R(-3,3)*scrollG.scale.x;burstSpark(w,2,rand()<.5?0xffe08a:0xfff6d8);}
+    if(f>=1){ws.on=false;scrollG.visible=false;scrollG.position.set(0,24,2);scrollG.scale.setScalar(1);scrollHalo.material.opacity=0;brushG.visible=true;ws.sealed=false;}}
   else brushG.position.lerp(toLocal(PW/2+200,80,1.5),.2);
   if(ws.dirty){composite();ws.dirty=false;}}
+
+// 天上聖母：收驚（經文＋法鈴）
+const MZ_COLS=['太上台星','應變無停','驅邪縛魅','保命護身','智慧明淨','心神安寧','三魂永久','魄無喪傾','南無香雲蓋菩薩摩訶薩','皈依大悲慈仁天上聖母天尊'];
+const TW=1024,TH=1024;const talC=document.createElement('canvas');talC.width=TW;talC.height=TH;const talBg=document.createElement('canvas');talBg.width=TW;talBg.height=TH;
+{const g=talBg.getContext('2d');const gr=g.createLinearGradient(0,0,0,TH);gr.addColorStop(0,'#f6d66a');gr.addColorStop(1,'#eabd45');g.fillStyle=gr;g.fillRect(0,0,TW,TH);
+  for(let i=0;i<1400;i++){g.strokeStyle=`rgba(${150+rand()*60|0},${100+rand()*40|0},20,${.06+rand()*.1})`;g.lineWidth=.7;const x=rand()*TW,y=rand()*TH;g.beginPath();g.moveTo(x,y);g.lineTo(x+R(-10,10),y+R(-10,10));g.stroke();}
+  g.strokeStyle='#b01818';g.lineWidth=10;g.strokeRect(30,30,TW-60,TH-60);g.lineWidth=3;g.strokeRect(48,48,TW-96,TH-96);}
+const talTex=new THREE.CanvasTexture(talC);
+const colX=i=>866-i*76;
+function talDraw(alphas,sealed){const g=talC.getContext('2d');g.drawImage(talBg,0,0);g.textAlign='center';g.textBaseline='middle';
+  g.fillStyle='#a01010';g.font='900 66px "LXGW WenKai TC","Noto Serif TC",serif';[...'天上聖母經'].forEach((ch,k)=>g.fillText(ch,952,150+k*78));
+  g.fillStyle='rgba(160,16,16,.5)';g.fillRect(906,90,3,TH-180);
+  g.font='700 60px "LXGW WenKai TC","Noto Serif TC",serif';
+  MZ_COLS.forEach((txt,i)=>{const a=alphas[i]||0;if(a<=0)return;g.save();g.globalAlpha=Math.min(1,a);if(a<1){g.shadowColor='#ffefa0';g.shadowBlur=30*(1-a)+6;}
+    g.fillStyle='#b01818';[...txt].forEach((ch,k)=>g.fillText(ch,colX(i),118+k*70));g.restore();});
+  if(sealed){g.save();g.translate(150,860);g.rotate(-.06);g.fillStyle='#c0281e';g.fillRect(-70,-70,140,140);g.strokeStyle='#f6d66a';g.lineWidth=4;g.strokeRect(-60,-60,120,120);
+    g.fillStyle='#f6d66a';g.font='900 46px "Noto Serif TC",serif';g.fillText('天',26,-28);g.fillText('上',26,28);g.fillText('聖',-26,-28);g.fillText('母',-26,28);g.restore();}
+  talTex.needsUpdate=true;}
+const talG=new THREE.Group();talG.position.set(0,24,2);talG.visible=false;world.add(talG);
+const talMesh=new THREE.Mesh(new THREE.PlaneGeometry(12,12).translate(0,-6,0),new THREE.MeshBasicMaterial({map:talTex,side:THREE.DoubleSide,transparent:true}));talG.add(talMesh);
+const talHalo=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex,color:0xffc870,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0}));talHalo.position.set(0,-6,-.6);talHalo.scale.set(22,22,1);talG.add(talHalo);
+const talRodT=new THREE.Group(),talRodB=new THREE.Group();talG.add(talRodT,talRodB);
+for(const r of[talRodT,talRodB]){const c=mesh(new THREE.CylinderGeometry(.3,.3,13,16),M.red,0,0,0,r);c.rotation.z=Math.PI/2;for(const s of[1,-1])mesh(new THREE.SphereGeometry(.36,12,10),gilt,s*6.6,0,0,r);}
+talRodT.position.y=.1;
+// 法鈴
+const fBell=new THREE.Group();talG.add(fBell);fBell.position.set(8.2,-4,1);
+const fBellSwing=new THREE.Group();fBell.add(fBellSwing);
+{const B=fBellSwing;mesh(new THREE.CylinderGeometry(.11,.13,1.5,12),gilt,0,1.0,0,B);mesh(new THREE.SphereGeometry(.2,12,10),gilt,0,1.8,0,B);
+  for(let k=0;k<4;k++){const a=k/4*Math.PI*2;tube([new V3(0,1.9,0),new V3(Math.cos(a)*.32,2.2,Math.sin(a)*.32),new V3(Math.cos(a)*.12,2.65,Math.sin(a)*.12)],.045,gilt,B,false,10);}
+  mesh(new THREE.ConeGeometry(.08,.6,8),gilt,0,2.8,0,B);
+  const bp=[[0,0],[.25,0],[.42,-.12],[.52,-.5],[.58,-.95],[.72,-1.12],[.66,-1.15]].map(([x,y])=>new THREE.Vector2(x,y));
+  mesh(new THREE.LatheGeometry(bp,32),new THREE.MeshStandardMaterial({color:0xd8a040,metalness:.9,roughness:.2,envMap:envTex,side:THREE.DoubleSide,emissive:0x3a2000}),0,.25,0,B);
+  for(let k=0;k<3;k++)mesh(new THREE.TorusGeometry(.5+k*.05,.025,6,32),gilt,0,-.15-k*.25,0,B).rotation.x=Math.PI/2;
+  const cl=new THREE.Group();cl.position.y=.2;B.add(cl);mesh(new THREE.CylinderGeometry(.02,.02,.9,6),gilt,0,-.45,0,cl);mesh(new THREE.SphereGeometry(.12,10,8),gilt,0,-.9,0,cl);fBell.userData.cl=cl;
+  const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex,color:0xfff0b0,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0}));gl.position.y=-.4;gl.scale.setScalar(4);B.add(gl);fBell.userData.gl=gl;}
+const ms={on:false,phase:'',t:0,col:0,alphas:[],sealed:false,amp:0,next:0};
+function ling(){[0,.12,.24].forEach((dt,i)=>{const f0=1760*(1+(Math.random()-.5)*.03);tone(f0,dt,1.0,.07-i*.012);tone(f0*2.76,dt,.55,.03);tone(f0*5.4,dt,.3,.014);});ms.amp=1;}
+function offerMazu(){altarExtra.mazu.visible=true;
+  const go=()=>{ms.on=true;ms.phase='unroll';ms.t=0;ms.col=0;ms.alphas=MZ_COLS.map(()=>0);ms.sealed=false;ms.next=0;talG.visible=true;talG.position.set(0,24,2);talG.scale.setScalar(1);talMesh.material.opacity=1;talHalo.material.opacity=0;fBell.visible=true;talDraw(ms.alphas,false);ling();};
+  if(document.fonts&&document.fonts.load)document.fonts.load('700 60px "LXGW WenKai TC"',MZ_COLS.join('')+'天上聖母經').then(go,go);else go();
+  burstSpark(altarTop(),30,0xffd88a);}
+function mazuAura(){const p=new V3(0,BY+.5,BZ);for(let k=0;k<4;k++){const m=new THREE.Mesh(new THREE.TorusGeometry(1,.08,6,96),new THREE.MeshBasicMaterial({color:k%2?0xffb0c8:0xffe0a0,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false}));
+    m.rotation.x=Math.PI/2;m.position.copy(p);world.add(m);ripples.push({m,age:-k*.4});}
+  burstSpark(new V3(0,BY+13,BZ),70,0xffe08a);burstSpark(new V3(0,BY+13,BZ),40,0xffb8d0);
+  [523,659,784,1047].forEach((f,i)=>tone(f,i*.1,3,.07));tone(262,0,4,.08);}
+function updMazu(dt,t){fBell.userData&&(()=>{ms.amp=Math.max(0,ms.amp-dt*1.4);fBellSwing.rotation.z=Math.sin(t*26)*.4*ms.amp;fBell.userData.cl.rotation.z=Math.sin(t*26+1)*.6*ms.amp;fBell.userData.gl.material.opacity=ms.amp*.9;})();
+  if(!ms.on)return;ms.t+=dt;const wp=new V3();talG.getWorldPosition(wp);talG.lookAt(camera.position.x,wp.y,camera.position.z);
+  if(ms.phase==='unroll'){const u=Math.min(1,ms.t/1.1);talMesh.scale.y=Math.max(.001,u);talTex.repeat.y=u;talTex.offset.y=1-u;talRodB.position.y=-12*u-.1;if(u>=1){ms.phase='chant';ms.t=0;}}
+  else if(ms.phase==='chant'){if(ms.t>=ms.next&&ms.col<MZ_COLS.length){ms.col++;ms.next+=ms.col>8?1.5:.95;ling();
+      const lp=new V3();fBell.getWorldPosition(lp);burstSpark(lp,8,0xfff0b0);}
+    let dirty=false;for(let i=0;i<ms.col;i++)if(ms.alphas[i]<1){ms.alphas[i]=Math.min(1,ms.alphas[i]+dt*1.6);dirty=true;}
+    if(dirty)talDraw(ms.alphas,false);
+    if(ms.col>=MZ_COLS.length&&ms.alphas[MZ_COLS.length-1]>=1&&ms.t>ms.next-.4){ms.phase='seal';ms.t=0;ms.sealed=true;talDraw(ms.alphas,true);ling();mazuAura();
+      const w=new V3();talMesh.getWorldPosition(w);burstSpark(w.add(new V3(0,-6,0)),60,0xffe08a);}}
+  else if(ms.phase==='seal'){talHalo.material.opacity=Math.min(.7,ms.t*.8);if(ms.t>3){ms.phase='out';ms.t=0;const w=new V3();fBell.getWorldPosition(w);burstSpark(w,25,0xfff0b0);fBell.visible=false;
+      [523,659,784,1047,1319].forEach((f,i)=>tone(f,i*.16,2.2,.06));}}
+  else if(ms.phase==='out'){const D=7,f=Math.min(1,ms.t/D),e=f*f*(3-2*f)*.35+f*f*.65;
+    talG.position.y=24+e*70;talG.position.x=Math.sin(ms.t*1.3)*1.2*f;talG.scale.setScalar(Math.max(.05,1-f*.65));
+    talMesh.material.opacity=f<.75?1:Math.max(0,1-(f-.75)/.25);talHalo.material.opacity=.85*(f<.8?1:Math.max(0,1-(f-.8)/.2));
+    ms.trail=(ms.trail||0)+dt;if(ms.trail>.08&&f<.9){ms.trail=0;const w=new V3();talMesh.getWorldPosition(w);w.y-=12*talG.scale.y*R(.2,1);w.x+=R(-4,4)*talG.scale.x;burstSpark(w,2,rand()<.5?0xffe08a:0xffc0d0);}
+    if(f>=1){ms.on=false;talG.visible=false;fBell.visible=true;}}}
 function updFx(dt,t){
+  updMazu(dt,t);
   updSwarm(coinSw,dt,-12,'coin');updSwarm(heartSw,dt,.6,'heart');
   lilyFly.forEach(l=>{if(!l.on)return;l.age+=dt;l.v.y+=.4*dt;l.s.position.x+=(l.v.x+Math.sin(l.age*1.5)*.8)*dt;l.s.position.y+=l.v.y*dt;l.s.position.z+=(l.v.z+Math.cos(l.age*1.3)*.8)*dt;
     l.s.material.rotation+=l.rot*dt;const f=l.age/l.life;l.s.material.opacity=Math.min(1,l.age*3)*(f>.8?(1-f)/.2:1);if(f>=1){l.on=false;l.s.visible=false;}});
@@ -1106,17 +1219,62 @@ cv.addEventListener('dblclick',()=>ringBell());
 let lastTap=0;cv.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')return;const n=performance.now();if(n-lastTap<300)ringBell();lastTap=n;});
 
 const bAuto=document.getElementById('bAuto');bAuto.onclick=()=>{auto=!auto;bAuto.classList.toggle('on',auto);};
-document.getElementById('bBell').onclick=ringBell;
-document.getElementById('bLamp').onclick=()=>{for(let i=0;i<12;i++)spawnLamp();};
+document.getElementById('bBell').onclick=()=>{ringBell();setAct('敲響晨鐘 🔔');};
+document.getElementById('bLamp').onclick=()=>{for(let i=0;i<12;i++)spawnLamp();setAct('點了蓮燈 🪷');};
 const bMode=document.getElementById('bMode');bMode.onclick=()=>{nightT=nightT?0:1;bMode.textContent=nightT?'🌅 晨曦':'🌙 夜晚';updateSub();};
 let deity='buddha';
-const SUBS={wealth:'財神爺 · 招財進寶',love:'月下老人 · 千里姻緣一線牽',fame:'文昌帝君 · 金榜題名'};
-const OFFER={wealth:['🪙 供元寶',offerWealth],love:['🌸 供百合',offerLove],fame:['🖌️ 供文房四寶',offerFame]};
+const SUBS={mazu:'天上聖母 · 收驚保平安',wealth:'財神爺 · 招財進寶',love:'月下老人 · 千里姻緣一線牽',fame:'文昌帝君 · 金榜題名'};
+const OFFER={mazu:['🔔 收驚',offerMazu],wealth:['🪙 供元寶',offerWealth],love:['🌸 供百合',offerLove],fame:['🖌️ 供文房四寶',offerFame]};
 function updateSub(){document.getElementById('sub').textContent=deity==='buddha'?(nightT?'地藏王菩薩 · 大願地藏':'大日如來 · 光明遍照'):SUBS[deity];}
 const bOffer=document.getElementById('bOffer');
-document.querySelectorAll('#wish [data-d]').forEach(b=>b.onclick=()=>{deity=b.dataset.d;document.querySelectorAll('#wish [data-d]').forEach(x=>x.classList.toggle('on',x===b));
+document.querySelectorAll('#wish [data-d]').forEach(b=>b.onclick=()=>{deity=b.dataset.d;setWish(deity);document.querySelectorAll('#wish [data-d]').forEach(x=>x.classList.toggle('on',x===b));
   if(deity==='buddha'){bOffer.style.display='none';}else{bOffer.style.display='';bOffer.textContent=OFFER[deity][0];}updateSub();});
-bOffer.onclick=()=>{if(OFFER[deity])OFFER[deity][1]();};
+bOffer.onclick=()=>{if(OFFER[deity]){OFFER[deity][1]();setAct(OFFER[deity][0].replace(/^\S+\s/,'')+(deity==='love'?' 🌸':deity==='wealth'?' 💰':deity==='mazu'?' 🙏':' 📜'));}};
+// ---------- 即時在線信徒 ----------
+const TZ_REGION={'Asia/Taipei':'台灣','Asia/Hong_Kong':'香港','Asia/Macau':'澳門','Asia/Shanghai':'中國','Asia/Chongqing':'中國','Asia/Urumqi':'中國','Asia/Singapore':'新加坡','Asia/Kuala_Lumpur':'馬來西亞','Asia/Kuching':'馬來西亞','Asia/Tokyo':'日本','Asia/Seoul':'韓國','Asia/Bangkok':'泰國','Asia/Ho_Chi_Minh':'越南','Asia/Saigon':'越南','Asia/Manila':'菲律賓','Asia/Jakarta':'印尼','Asia/Kolkata':'印度','Asia/Dubai':'阿聯',
+  'Australia/Sydney':'澳洲','Australia/Melbourne':'澳洲','Australia/Brisbane':'澳洲','Australia/Perth':'澳洲','Pacific/Auckland':'紐西蘭','Europe/London':'英國','Europe/Paris':'法國','Europe/Berlin':'德國','Europe/Amsterdam':'荷蘭','Europe/Madrid':'西班牙','Europe/Rome':'義大利',
+  'America/New_York':'美國東岸','America/Chicago':'美國中部','America/Denver':'美國山區','America/Los_Angeles':'美國西岸','America/Toronto':'加拿大','America/Vancouver':'加拿大','America/Sao_Paulo':'巴西'};
+function regionName(){try{const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';if(TZ_REGION[tz])return TZ_REGION[tz];
+  const lang=(navigator.language||'').toLowerCase();if(lang==='zh-tw')return '台灣';if(lang==='zh-hk')return '香港';
+  return tz.split('/').pop().replace(/_/g,' ')||'未知地區';}catch(e){return '未知地區';}}
+function deviceName(){const ua=navigator.userAgent||'';let m;
+  if(/iPhone/.test(ua))return 'iPhone';if(/iPad/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1))return 'iPad';
+  if(/Android/.test(ua)){m=ua.match(/Android [\d.]+;\s*([^;)]+?)(?:\s+Build|\))/);let n=m?m[1].trim():'';if(!n||n==='K'||/^wv$/.test(n))return 'Android 手機';
+    if(/^SM-/.test(n))n='Samsung '+n;else if(/^(M\d|2\d{3})/.test(n))n='小米 '+n;return n.slice(0,24);}
+  if(/Macintosh/.test(ua))return 'Mac';if(/Windows/.test(ua))return 'Windows 電腦';if(/CrOS/.test(ua))return 'Chromebook';if(/Linux/.test(ua))return 'Linux 電腦';return '神秘裝置';}
+const devIcon=d=>/iPhone|Android|Samsung|小米|Pixel|手機/.test(d)?'📱':/iPad/.test(d)?'📲':'💻';
+const WISH_NAME={buddha:'禮佛',wealth:'求財',love:'求姻緣',fame:'求功名',mazu:'收驚'};
+const me={dev:deviceName(),region:regionName(),wish:'禮佛',act:'',at:0};
+try{if(navigator.userAgentData&&navigator.userAgentData.getHighEntropyValues)navigator.userAgentData.getHighEntropyValues(['model']).then(v=>{if(v&&v.model){me.dev=(/^SM-/.test(v.model)?'Samsung ':'')+v.model;pushMe();renderOnline();}}).catch(()=>{});}catch(e){}
+let room=null,peerList=[];const feed=[];const seenAct=new Map();
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clip=(t,n)=>String(t==null?'':t).slice(0,n);
+function pushMe(){if(room)room.presence({dev:clip(me.dev,30),region:clip(me.region,20),wish:me.wish,act:clip(me.act,20),at:me.at}).catch(()=>{});}
+function addFeed(p,isMe){feed.unshift({t:Date.now(),txt:`${devIcon(p.dev)} ${clip(p.dev,30)} · ${clip(p.region,20)}${isMe?'（你）':''} ${clip(p.act,20)}`});if(feed.length>6)feed.pop();}
+function setAct(a){me.act=a;me.at=Date.now();if(!room)addFeed(me,true);pushMe();renderOnline();}
+function setWish(w){me.wish=WISH_NAME[w]||'禮佛';pushMe();renderOnline();}
+function renderOnline(){
+  const list=room?peerList.filter(p=>p.kind==='viewer'):[{isMe:true,sameTab:true,presence:me}];
+  const n=Math.max(1,list.length);
+  document.getElementById('onCount').textContent=`即時在線信徒 ${n} 位`;
+  const rows=list.map(p=>{const q=p.presence||{};const d=clip(q.dev||'…',30),r=clip(q.region||'',20);
+    return `<div class="row"><div class="ic">${devIcon(d)}</div><div><div><b>${esc(d)}</b>${p.isMe?(p.sameTab?'<span class="me">你</span>':'<span class="me">你（另一分頁）</span>'):''}</div><div class="sm">📍 ${esc(r)} · 🙏 ${esc(clip(q.wish||'禮佛',8))}</div></div></div>`;});
+  document.getElementById('onList').innerHTML=rows.join('');
+  document.getElementById('onFeed').innerHTML=feed.length?feed.map(f=>`<div>${esc(f.txt)}</div>`).join(''):'<div style="opacity:.5">等待第一炷香…</div>';
+  document.getElementById('onNote').textContent=room?'':'分享此頁給親友，在 Claude 中一起開啟即可看到彼此。';
+}
+const onBox=document.getElementById('online');
+if(innerWidth<700)onBox.classList.add('min');
+document.getElementById('onHd').onclick=()=>{onBox.classList.toggle('min');document.getElementById('onTog').textContent=onBox.classList.contains('min')?'▸':'▾';};
+document.getElementById('onTog').textContent=onBox.classList.contains('min')?'▸':'▾';
+renderOnline();
+(async()=>{try{if(!window.claude||!window.claude.use)return;room=await window.claude.use('room');}catch(e){room=null;}
+  if(!room){renderOnline();return;}
+  room.onPeers(ch=>{peerList=ch.peers.slice();
+    for(const p of ch.peers){const q=p.presence||{};if(q.at&&q.act&&seenAct.get(p.peer)!==q.at){const first=!seenAct.has(p.peer);seenAct.set(p.peer,q.at);if(!first||Date.now()-q.at<15000)addFeed(q,p.isMe&&p.sameTab);}}
+    renderOnline();},()=>{room=null;renderOnline();});
+  pushMe();renderOnline();})();
+
 const bFin=document.getElementById('bFin');bFin.onclick=()=>{woodFinish=!woodFinish;applyFinish();bFin.textContent=woodFinish?'✨ 金身':'🪵 木雕';};
 let closeUp=false;const bAltar=document.getElementById('bAltar');bAltar.onclick=()=>{closeUp=!closeUp;bAltar.classList.toggle('on',closeUp);
   if(closeUp){tRad=portrait?17:11.5;tPhi=1.22;tTheta=Math.round(tTheta/6.2832)*6.2832;auto=false;bAuto.classList.remove('on');}else{tRad=portrait?120:92;tPhi=1.18;}};
@@ -1124,7 +1282,7 @@ const ui=document.getElementById('ui');document.getElementById('eye').onclick=()
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 
 // ---------- loop ----------
-const clock=new THREE.Clock();const tmpV=new V3();const SW={vairo:1,ksiti:0,wealth:0,love:0,fame:0};
+const clock=new THREE.Clock();const tmpV=new V3();const SW={vairo:1,ksiti:0,wealth:0,love:0,fame:0,mazu:0};
 applyMode(0);setStatueMode(0,0);
 function tick(){
   const dt=Math.min(clock.getDelta(),0.05),t=clock.elapsedTime;
@@ -1147,7 +1305,7 @@ function tick(){
     p.s.position.set(BURN.x+p.x+Math.sin(t*.6+p.x*9)*f*1.6+f*2,BURN.y+3.7+f*11,BURN.z+p.z+Math.cos(t*.5+p.z*7)*f*1.2);
     p.s.scale.setScalar(.8+f*4.5);p.s.material.opacity=Math.sin(Math.PI*Math.min(1,f*1.3))*.45*(1-.4*night);p.s.material.rotation=f*2+p.x;});
   // statue swap
-  {const ST={vairo,ksiti,wealth:deityG.wealth,love:deityG.love,fame:deityG.fame};const ak=deity==='buddha'?(nightT?'ksiti':'vairo'):deity;
+  {const ST={vairo,ksiti,wealth:deityG.wealth,love:deityG.love,fame:deityG.fame,mazu:deityG.mazu};const ak=deity==='buddha'?(nightT?'ksiti':'vairo'):deity;
    let othersOut=true;for(const k in ST)if(k!==ak&&SW[k]>.03)othersOut=false;let tr=0;
    for(const k in ST){if(k===ak){if(othersOut)SW[k]=Math.min(1,SW[k]+dt*1.8);}else SW[k]=Math.max(0,SW[k]-dt*2.4);
      const e=SW[k]*SW[k]*(3-2*SW[k]);ST[k].scale.setScalar(BS*Math.max(.001,e));ST[k].visible=SW[k]>.005;tr=Math.max(tr,SW[k]*(1-SW[k])*4);}
